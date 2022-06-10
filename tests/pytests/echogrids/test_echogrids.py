@@ -2,7 +2,12 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-from themachinethatgoesping.tools import echogrids
+# test basic imports
+from themachinethatgoesping import echogrids
+from themachinethatgoesping.echogrids import EchoGrid
+from themachinethatgoesping.echogrids import functions
+from themachinethatgoesping.echogrids.functions import gridfunctions
+from themachinethatgoesping.echogrids.functions.gridfunctions import GRIDDER
 
 import time
 import pytest
