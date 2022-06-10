@@ -4,20 +4,43 @@
 # SPDX-License-Identifier: MPL-2.0
 
 """
-functions to create echogrids
+Helper functions for the gridder class, implemented using numba
 """
 
-from numba import njit, prange
+import math
+
 import numba.types as ntypes
 import numpy as np
-import math
-import numpy as np
+from numba import njit, prange
 
 from . import helperfunctions as hlp
 
-
+# --- some usefull functions ---
 @njit
-def get_minmax(sx, sy, sz):
+def get_minmax(sx: np.array,
+                   sy: np.array,
+                   sz: np.array) -> tuple:
+    """returns the min/max value of three lists (same size). 
+    Sometimes faster than seperate numpy functions because it only loops once.
+
+    Parameters
+    ----------
+    sx : np.array
+        1D array with x positions (same size)
+    sy : np.array
+        1D array with x positions (same size)
+    sz : np.array
+        1D array with x positions (same size)
+
+    Returns
+    -------
+    tuple
+        with (xmin,xmax,ymin,ymax,zmin,zmax)
+    """
+
+    assert len(sx) == len(sy) == len(
+        sz), "expected length of all arrays to be the same"
+
     minx = np.nan
     maxx = np.nan
     miny = np.nan
@@ -44,6 +67,8 @@ def get_minmax(sx, sy, sz):
             maxz = z
 
     return minx, maxx, miny, maxy, minz, maxz
+
+# --- static helper functions for the gridder (implemented using numba) ---
 
 
 @njit
