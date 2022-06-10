@@ -5,6 +5,7 @@
 # -- python sources --
 sources = [
     'themachinethatgoesping/echogrids/__init__.py',
+    'themachinethatgoesping/echogrids/echogrid.py',
     'themachinethatgoesping/echogrids/functions/__init__.py',
     'themachinethatgoesping/echogrids/functions/gridfunctions.py',
     'themachinethatgoesping/echogrids/functions/helperfunctions.py',

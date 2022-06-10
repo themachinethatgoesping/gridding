@@ -15,6 +15,7 @@ import numpy as np
 
 from . import helperfunctions as hlp
 
+
 @njit
 def get_minmax(sx, sy, sz):
     minx = np.nan
@@ -29,20 +30,26 @@ def get_minmax(sx, sy, sz):
         y = sy[i]
         z = sz[i]
 
-        if not x > minx: minx = x
-        if not x < maxx: maxx = x
-        if not y > miny: miny = y
-        if not y < maxy: maxy = y
-        if not z > minz: minz = z
-        if not z < maxz: maxz = z
+        if not x > minx:
+            minx = x
+        if not x < maxx:
+            maxx = x
+        if not y > miny:
+            miny = y
+        if not y < maxy:
+            maxy = y
+        if not z > minz:
+            minz = z
+        if not z < maxz:
+            maxz = z
 
     return minx, maxx, miny, maxy, minz, maxz
-
 
 
 @njit
 def get_index(val, grd_val_min, grd_res):
     return hlp.round_int((val - grd_val_min) / grd_res)
+
 
 @njit
 def get_index_fraction(val, grd_val_min, grd_res):
@@ -59,12 +66,10 @@ def get_grd_value(value, grd_val_min, grd_res):
     return get_value(get_index(value, grd_val_min, grd_res), grd_val_min, grd_res)
 
 
-
 @njit
-def get_index_vals(fraction_index_x : float,
-                   fraction_index_y : float,
-                   fraction_index_z : float) -> (np.ndarray,np.ndarray,np.ndarray,np.ndarray):
-
+def get_index_vals(fraction_index_x: float,
+                   fraction_index_y: float,
+                   fraction_index_z: float) -> (np.ndarray, np.ndarray, np.ndarray, np.ndarray):
     """
     Return a vector with fraction and weights for the neighboring grid cells.
     This allows for a linear interpolation (right?)
@@ -158,7 +163,6 @@ def get_index_vals2_sup(fraction_index_x_min, fraction_index_x_max):
     return X, W
 
 
-
 # print(sum(WEIGHT))
 
 @njit
@@ -191,21 +195,20 @@ def get_index_vals2(fraction_index_x_min, fraction_index_x_max,
 
 
 @njit()
-def get_index_vals_inv_dist(x,xmin,xres,
-                            y,ymin,yres,
-                            z,zmin,zres,
+def get_index_vals_inv_dist(x, xmin, xres,
+                            y, ymin, yres,
+                            z, zmin, zres,
                             R):
     norm_x = (x - xmin)
     norm_y = (y - ymin)
     norm_z = (z - zmin)
 
-    ix_min = hlp.round_int((norm_x - R ) / xres)
-    ix_max = hlp.round_int((norm_x + R ) / xres)
-    iy_min = hlp.round_int((norm_y - R ) / yres)
-    iy_max = hlp.round_int((norm_y + R ) / yres)
-    iz_min = hlp.round_int((norm_z - R ) / zres)
-    iz_max = hlp.round_int((norm_z + R ) / zres)
-
+    ix_min = hlp.round_int((norm_x - R) / xres)
+    ix_max = hlp.round_int((norm_x + R) / xres)
+    iy_min = hlp.round_int((norm_y - R) / yres)
+    iy_max = hlp.round_int((norm_y + R) / yres)
+    iz_min = hlp.round_int((norm_z - R) / zres)
+    iz_max = hlp.round_int((norm_z + R) / zres)
 
     # X = ntypes.List(ntypes.int64)
     # Y = ntypes.List(ntypes.int64)
@@ -218,17 +221,17 @@ def get_index_vals_inv_dist(x,xmin,xres,
 
     min_dr = R / 10
 
-    for ix in np.arange(ix_min,ix_max):
+    for ix in np.arange(ix_min, ix_max):
         dx = norm_x - ix * xres
         dx2 = dx*dx
-        for iy in np.arange(iy_min,iy_max):
+        for iy in np.arange(iy_min, iy_max):
             dy = norm_y - iy * yres
             dy2 = dy*dy
-            for iz in np.arange(iz_min,iz_max):
+            for iz in np.arange(iz_min, iz_max):
                 dz = norm_z - iz * zres
                 dz2 = dz*dz
                 dr2 = dx2 + dy2 + dz2
-                dr  = math.sqrt(dr2)
+                dr = math.sqrt(dr2)
 
                 if dr <= R:
                     if dr < min_dr:
@@ -250,13 +253,13 @@ def get_index_vals_inv_dist(x,xmin,xres,
 
 @njit()
 def get_sampled_image_inv_dist(sx, sy, sz, sv,
-                       xmin, xres, nx,
-                       ymin, yres, ny,
-                       zmin, zres, nz,
-                       imagenum,
-                       imagesum,
-                       radius,
-                       skip_invalid=True):
+                               xmin, xres, nx,
+                               ymin, yres, ny,
+                               zmin, zres, nz,
+                               imagenum,
+                               imagesum,
+                               radius,
+                               skip_invalid=True):
 
     for i in range(len(sx)):
         x = sx[i]
@@ -267,7 +270,6 @@ def get_sampled_image_inv_dist(sx, sy, sz, sv,
         if i >= len(radius):
             print(len(radius), len(sx))
             raise RuntimeError('aaaah ')
-
 
         IX, IY, IZ, WEIGHT = get_index_vals_inv_dist(x, xmin, xres,
                                                      y, ymin, yres,
@@ -285,34 +287,45 @@ def get_sampled_image_inv_dist(sx, sy, sz, sv,
                 continue
 
             if not skip_invalid:
-                if ix < 0: ix = 0
-                if iy < 0: iy = 0
-                if iz < 0: iz = 0
+                if ix < 0:
+                    ix = 0
+                if iy < 0:
+                    iy = 0
+                if iz < 0:
+                    iz = 0
 
-                if abs(ix) >= nx: ix = nx - 1
-                if abs(iy) >= ny: iy = ny - 1
-                if abs(iz) >= nz: iz = nz - 1
+                if abs(ix) >= nx:
+                    ix = nx - 1
+                if abs(iy) >= ny:
+                    iy = ny - 1
+                if abs(iz) >= nz:
+                    iz = nz - 1
             else:
-                if ix < 0: continue
-                if iy < 0: continue
-                if iz < 0: continue
+                if ix < 0:
+                    continue
+                if iy < 0:
+                    continue
+                if iz < 0:
+                    continue
 
-                if abs(ix) >= nx: continue
-                if abs(iy) >= ny: continue
-                if abs(iz) >= nz: continue
+                if abs(ix) >= nx:
+                    continue
+                if abs(iy) >= ny:
+                    continue
+                if abs(iz) >= nz:
+                    continue
 
             # print(ix,iy,iz,v,w)
             if v >= 0:
                 imagesum[ix][iy][iz] += v * w
                 imagenum[ix][iy][iz] += w
 
-
     return imagesum, imagenum
 
 
 #@njit(parallel = True)
 @njit()
-def get_sampled_image2(sx, sy, sz, sv,
+def get_sampled_image2(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
                        xmin, xres, nx,
                        ymin, yres, ny,
                        zmin, zres, nz,
@@ -320,7 +333,6 @@ def get_sampled_image2(sx, sy, sz, sv,
                        imagesum,
                        extent=None,
                        skip_invalid=True):
-
 
     for i in range(len(sx)):
         x = sx[i]
@@ -342,9 +354,12 @@ def get_sampled_image2(sx, sy, sz, sv,
             length_2 = extent[i] / 2
 
             IX, IY, IZ, WEIGHT = get_index_vals2(
-                get_index_fraction(x - length_2, xmin, xres), get_index_fraction(x + length_2, xmin, xres),
-                get_index_fraction(y - length_2, ymin, yres), get_index_fraction(y + length_2, ymin, yres),
-                get_index_fraction(z - length_2, zmin, zres), get_index_fraction(z + length_2, zmin, zres)
+                get_index_fraction(
+                    x - length_2, xmin, xres), get_index_fraction(x + length_2, xmin, xres),
+                get_index_fraction(
+                    y - length_2, ymin, yres), get_index_fraction(y + length_2, ymin, yres),
+                get_index_fraction(
+                    z - length_2, zmin, zres), get_index_fraction(z + length_2, zmin, zres)
             )
 
         # for ix,iy,iz,w in zip(IX,IY,IZ,WEIGHT):
@@ -358,27 +373,38 @@ def get_sampled_image2(sx, sy, sz, sv,
                 continue
 
             if not skip_invalid:
-                if ix < 0: ix = 0
-                if iy < 0: iy = 0
-                if iz < 0: iz = 0
+                if ix < 0:
+                    ix = 0
+                if iy < 0:
+                    iy = 0
+                if iz < 0:
+                    iz = 0
 
-                if abs(ix) >= nx: ix = nx - 1
-                if abs(iy) >= ny: iy = ny - 1
-                if abs(iz) >= nz: iz = nz - 1
+                if abs(ix) >= nx:
+                    ix = nx - 1
+                if abs(iy) >= ny:
+                    iy = ny - 1
+                if abs(iz) >= nz:
+                    iz = nz - 1
             else:
-                if ix < 0: continue
-                if iy < 0: continue
-                if iz < 0: continue
+                if ix < 0:
+                    continue
+                if iy < 0:
+                    continue
+                if iz < 0:
+                    continue
 
-                if abs(ix) >= nx: continue
-                if abs(iy) >= ny: continue
-                if abs(iz) >= nz: continue
+                if abs(ix) >= nx:
+                    continue
+                if abs(iy) >= ny:
+                    continue
+                if abs(iz) >= nz:
+                    continue
 
             # print(ix,iy,iz,v,w)
             if v >= 0:
                 imagesum[ix][iy][iz] += v * w
                 imagenum[ix][iy][iz] += w
-
 
     return imagesum, imagenum
 
@@ -390,8 +416,7 @@ def get_sampled_image(sx, sy, sz, sv,
                       zmin, zres, nz,
                       imagenum,
                       imagesum,
-                      skip_invalid = True):
-
+                      skip_invalid=True):
 
     for i in range(len(sx)):
         x = sx[i]
@@ -404,27 +429,40 @@ def get_sampled_image(sx, sy, sz, sv,
         iz = get_index(z, zmin, zres)
 
         if not skip_invalid:
-            if ix < 0: ix = 0
-            if iy < 0: iy = 0
-            if iz < 0: iz = 0
+            if ix < 0:
+                ix = 0
+            if iy < 0:
+                iy = 0
+            if iz < 0:
+                iz = 0
 
-            if abs(ix) >= nx: ix = nx - 1
-            if abs(iy) >= ny: iy = ny - 1
-            if abs(iz) >= nz: iz = nz - 1
+            if abs(ix) >= nx:
+                ix = nx - 1
+            if abs(iy) >= ny:
+                iy = ny - 1
+            if abs(iz) >= nz:
+                iz = nz - 1
         else:
-            if ix < 0: continue
-            if iy < 0: continue
-            if iz < 0: continue
+            if ix < 0:
+                continue
+            if iy < 0:
+                continue
+            if iz < 0:
+                continue
 
-            if abs(ix) >= nx: continue
-            if abs(iy) >= ny: continue
-            if abs(iz) >= nz: continue
+            if abs(ix) >= nx:
+                continue
+            if abs(iy) >= ny:
+                continue
+            if abs(iz) >= nz:
+                continue
 
         if v >= 0:
             imagesum[ix][iy][iz] += v
             imagenum[ix][iy][iz] += 1
 
     return imagesum, imagenum
+
 
 class GRIDDER(object):
 
@@ -486,9 +524,15 @@ class GRIDDER(object):
         self.zmax = nz * zres + self.zmin
 
         # with round, the rounding error will be eliminated which cause res=0.3 to crash
-        self.nx = math.floor(round(((self.xmax - self.xmin) / self.xres), 8)) + 1  # num of elements x
-        self.ny = math.floor(round(((self.ymax - self.ymin) / self.yres), 8)) + 1  # num of elements y
-        self.nz = math.floor(round(((self.zmax - self.zmin) / self.zres), 8)) + 1  # num of elements z
+        # num of elements x
+        self.nx = math.floor(
+            round(((self.xmax - self.xmin) / self.xres), 8)) + 1
+        # num of elements y
+        self.ny = math.floor(
+            round(((self.ymax - self.ymin) / self.yres), 8)) + 1
+        # num of elements z
+        self.nz = math.floor(
+            round(((self.zmax - self.zmin) / self.zres), 8)) + 1
         # self.nx=math.floor((self.xmax-self.xmin)/self.res)+1 #num of elements y
         # self.ny=math.floor((self.ymax-self.ymin)/self.res)+1 #num of elements x
 
@@ -572,29 +616,34 @@ class GRIDDER(object):
 
         return coordinates
 
-    def get_sampled_image(self,sx, sy, sz, s_val,skip_invalid = True):
-        #returns imagesum, imagenum
-        return get_sampled_image(sx, sy, sz, s_val, *self.get_min_and_offset(),skip_invalid = skip_invalid)
+    def get_sampled_image(self, sx, sy, sz, s_val, skip_invalid=True):
+        imagenum = np.zeros((self.nx, self.ny, self.nz)).astype(np.int64)
+        imagesum = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
 
-    def append_sampled_image(self,sx, sy, sz, s_val,
+        return get_sampled_image(sx, sy, sz, s_val, *self.get_min_and_offset(), imagenum=imagenum, imagesum=imagesum, skip_invalid=skip_invalid)
+
+    def append_sampled_image(self, sx, sy, sz, s_val,
                              imagesum, imagenum,
-                             skip_invalid = True):
+                             skip_invalid=True):
 
         if imagenum is None:
             imagenum = np.zeros((self.nx, self.ny, self.nz)).astype(np.int64)
         if imagesum is None:
             imagesum = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
-        return get_sampled_image(sx, sy, sz, s_val, *self.get_min_and_offset(),imagenum = imagenum, imagesum = imagesum,skip_invalid = skip_invalid)
+        return get_sampled_image(sx, sy, sz, s_val, *self.get_min_and_offset(), imagenum=imagenum, imagesum=imagesum, skip_invalid=skip_invalid)
 
-    def get_sampled_image2(self,sx, sy, sz, s_val,skip_invalid = True,
-                          extent   = None):
+    def get_sampled_image2(self, sx, sy, sz, s_val, skip_invalid=True,
+                           extent=None):
+        imagenum = np.zeros((self.nx, self.ny, self.nz)).astype(np.int64)
+        imagesum = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
+
         #returns imagesum, imagenum
-        return get_sampled_image2(sx, sy, sz, s_val, *self.get_min_and_offset(),skip_invalid = skip_invalid,extent=extent)
+        return get_sampled_image2(sx, sy, sz, s_val, *self.get_min_and_offset(), imagenum=imagenum, imagesum=imagesum, skip_invalid=skip_invalid, extent=extent)
 
-    def append_sampled_image2(self,sx, sy, sz, s_val,
-                             imagesum, imagenum,
-                             skip_invalid = True,
-                          extent   = None
+    def append_sampled_image2(self, sx, sy, sz, s_val,
+                              imagesum, imagenum,
+                              skip_invalid=True,
+                              extent=None
                               ):
 
         if imagenum is None:
@@ -606,11 +655,11 @@ class GRIDDER(object):
                                   skip_invalid=skip_invalid,
                                   extent=extent)
 
-    def append_sampled_image_inv_dist(self,sx, sy, sz, s_val,
-                             imagesum, imagenum,
-                             skip_invalid = True,
-                          radius   = None
-                              ):
+    def append_sampled_image_inv_dist(self, sx, sy, sz, s_val,
+                                      imagesum, imagenum,
+                                      skip_invalid=True,
+                                      radius=None
+                                      ):
 
         if imagenum is None:
             imagenum = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
@@ -618,14 +667,15 @@ class GRIDDER(object):
             imagesum = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
 
         return get_sampled_image_inv_dist(sx, sy, sz, s_val, *self.get_min_and_offset(), imagenum=imagenum, imagesum=imagesum,
-                                  skip_invalid=skip_invalid,
-                                  radius=radius)
+                                          skip_invalid=skip_invalid,
+                                          radius=radius)
+
 
 if __name__ == '__main__':
     minx = -22
-    maxx =  22
+    maxx = 22
     miny = -22
-    maxy =  22
+    maxy = 22
     minz = -120
     maxz = 0
 
@@ -648,4 +698,3 @@ if __name__ == '__main__':
     print(index, gridder.get_x_grd_value(index))
 
     print(gridder.get_extent_x())
-
