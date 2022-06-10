@@ -11,6 +11,8 @@ on:
     paths-ignore:
       - '.github/workflows/python-package*'
       - '.github/workflows/cibuildwheels*'
+      - '.github/workflows/conda*'
+      - 'conda.recipe/*'
     #paths:
     #  - "**meson.build"
     #  - "**.cpp"
@@ -21,6 +23,9 @@ on:
     
     paths-ignore:
       - '.github/workflows/python-package*'
+      - '.github/workflows/cibuildwheels*'
+      - '.github/workflows/conda*'
+      - 'conda.recipe/*'
     #paths:
     #  - "**meson.build"
     #  - "**.cpp"
@@ -85,6 +90,9 @@ jobs:
 
     - name: install project
       run: meson install -C builddir/
+
+    - name: install pip requirements
+      run: pip install -r requirements.txt
 
     - name: test (pytest)
       run: pytest -v
