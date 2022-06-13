@@ -146,6 +146,132 @@ class ForwardGridder(object):
         self.border_zmin = self.zmin - self.zres / 2.0
         self.border_zmax = self.zmax + self.zres / 2.0
 
+    def get_empty_grd_images(self) -> tuple:
+        """create empty num and sum gridimages
+
+        Returns
+        -------
+        (image_values, image_weights): 
+            image_values: summed value for each grid position
+            image_weights: weights for each grid position
+        """
+        image_values = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
+        image_weights = np.zeros(
+            (self.nx, self.ny, self.nz)).astype(np.float64)
+
+        return image_values, image_weights
+
+    def interpolate_block_mean(self,
+                               sx: np.array, sy: np.array, sz: np.array, s_val: np.array,
+                               image_values: np.ndarray = None,
+                               image_weights: np.ndarray = None,
+                               skip_invalid: bool = True) -> tuple:
+        """interpolate 3D points onto 3d images using block mean interpolation
+
+        Parameters
+        ----------
+        sx : np.array
+            x values
+        sy : np.array
+            y values
+        sz : np.array
+            z values
+        s_val : np.array
+            amplitudes / volume backscattering coefficients
+        image_values : np.ndarray, optional
+            Image with values. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
+        image_weights : np.ndarray, optional
+            Image with weights. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
+        skip_invalid : bool, optional
+            skip values that exceed border_xmin, _xmax, _ymin, _ymax, _zmin, _zmax. Otherwise throw exception by default True
+
+        Returns
+        -------
+        tuple
+            image_values, image_weights
+        """
+
+        if image_values is None or image_weights is None:
+            image_weights, image_values = self.get_empty_grd_images()
+        else:
+            assert image_values.shape == (
+                self.nx, self.ny, self.nz), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
+            assert image_weights.shape == (
+                self.nx, self.ny, self.nz), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
+
+        return grdf.grd_block_mean(
+            np.array(sx), np.array(sy), np.array(sz), np.array(s_val),
+            *self._get_min_and_offset(),
+            image_values=image_values, image_weights=image_weights,
+            skip_invalid=skip_invalid)
+
+    def interpolate_weighted_mean(self,
+                                  sx: np.array, sy: np.array, sz: np.array, s_val: np.array,
+                                  image_values: np.ndarray = None,
+                                  image_weights: np.ndarray = None,
+                                  skip_invalid: bool = True):
+        """interpolate 3D points onto 3d images using weighted mean interpolation
+
+        Parameters
+        ----------
+        sx : np.array
+            x values
+        sy : np.array
+            y values
+        sz : np.array
+            z values
+        s_val : np.array
+            amplitudes / volume backscattering coefficients
+        image_values : np.ndarray, optional
+            Image with values. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
+        image_weights : np.ndarray, optional
+            Image with weights. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
+        skip_invalid : bool, optional
+            skip values that exceed border_xmin, _xmax, _ymin, _ymax, _zmin, _zmax. Otherwise throw exception by default True
+
+        Returns
+        -------
+        tuple
+            image_values, image_weights
+        """
+
+        if image_values is None or image_weights is None:
+            image_weights, image_values = self.get_empty_grd_images()
+        else:
+            assert image_values.shape == (
+                self.nx, self.ny, self.nz), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
+            assert image_weights.shape == (
+                self.nx, self.ny, self.nz), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
+
+        return grdf.grd_weighted_mean(
+            np.array(sx), np.array(sy), np.array(sz), np.array(s_val),
+            *self._get_min_and_offset(),
+            image_values=image_values, image_weights=image_weights,
+            skip_invalid=skip_invalid)
+
+    @staticmethod
+    def get_minmax(sx: np.array,
+                   sy: np.array,
+                   sz: np.array) -> tuple:
+        """returns the min/max value of three lists (same size). 
+        Sometimes faster than seperate numpy functions because it only loops once.
+
+        Parameters
+        ----------
+        sx : np.array
+            1D array with x positions (same size)
+        sy : np.array
+            1D array with x positions (same size)
+        sz : np.array
+            1D array with x positions (same size)
+
+        Returns
+        -------
+        tuple
+            with (xmin,xmax,ymin,ymax,zmin,zmax)
+        """
+        return grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz))
+
     def get_x_index(self, x: float) -> int:
         """get the x index of the gridcell that physically contains "x"
 
@@ -343,132 +469,6 @@ class ForwardGridder(object):
             coordinates.append(self.get_z_value(i))
 
         return coordinates
-
-    def get_empty_grd_images(self) -> tuple:
-        """create empty num and sum gridimages
-
-        Returns
-        -------
-        (image_weights,image_values): 
-            image_values: summed value for each grid position
-            image_weights: weights for each grid position
-        """
-        image_values = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
-        image_weights = np.zeros(
-            (self.nx, self.ny, self.nz)).astype(np.float64)
-
-        return image_values, image_weights
-
-    def interpolate_block_mean(self,
-                               sx: np.array, sy: np.array, sz: np.array, s_val: np.array,
-                               image_values: np.ndarray = None,
-                               image_weights: np.ndarray = None,
-                               skip_invalid: bool = True) -> tuple:
-        """interpolate 3D points onto 3d images using block mean interpolation
-
-        Parameters
-        ----------
-        sx : np.array
-            x values
-        sy : np.array
-            y values
-        sz : np.array
-            z values
-        s_val : np.array
-            amplitudes / volume backscattering coefficients
-        image_values : np.ndarray, optional
-            Image with values. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
-        image_weights : np.ndarray, optional
-            Image with weights. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
-        skip_invalid : bool, optional
-            skip values that exceed border_xmin, _xmax, _ymin, _ymax, _zmin, _zmax. Otherwise throw exception by default True
-
-        Returns
-        -------
-        tuple
-            image_values, image_weights
-        """
-
-        if image_values is None or image_weights is None:
-            image_weights, image_values = self.get_empty_grd_images()
-        else:
-            assert image_values.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
-            assert image_weights.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
-
-        return grdf.grd_block_mean(
-            np.array(sx), np.array(sy), np.array(sz), np.array(s_val),
-            *self._get_min_and_offset(),
-            image_values=image_values, image_weights=image_weights,
-            skip_invalid=skip_invalid)
-
-    def interpolate_weighted_mean(self,
-                                  sx: np.array, sy: np.array, sz: np.array, s_val: np.array,
-                                  image_values: np.ndarray = None,
-                                  image_weights: np.ndarray = None,
-                                  skip_invalid: bool = True):
-        """interpolate 3D points onto 3d images using weighted mean interpolation
-
-        Parameters
-        ----------
-        sx : np.array
-            x values
-        sy : np.array
-            y values
-        sz : np.array
-            z values
-        s_val : np.array
-            amplitudes / volume backscattering coefficients
-        image_values : np.ndarray, optional
-            Image with values. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
-        image_weights : np.ndarray, optional
-            Image with weights. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
-        skip_invalid : bool, optional
-            skip values that exceed border_xmin, _xmax, _ymin, _ymax, _zmin, _zmax. Otherwise throw exception by default True
-
-        Returns
-        -------
-        tuple
-            image_values, image_weights
-        """
-
-        if image_values is None or image_weights is None:
-            image_weights, image_values = self.get_empty_grd_images()
-        else:
-            assert image_values.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
-            assert image_weights.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
-
-        return grdf.grd_weighted_mean(
-            np.array(sx), np.array(sy), np.array(sz), np.array(s_val),
-            *self._get_min_and_offset(),
-            image_values=image_values, image_weights=image_weights,
-            skip_invalid=skip_invalid)
-
-    @staticmethod
-    def get_minmax(sx: np.array,
-                   sy: np.array,
-                   sz: np.array) -> tuple:
-        """returns the min/max value of three lists (same size). 
-        Sometimes faster than seperate numpy functions because it only loops once.
-
-        Parameters
-        ----------
-        sx : np.array
-            1D array with x positions (same size)
-        sy : np.array
-            1D array with x positions (same size)
-        sz : np.array
-            1D array with x positions (same size)
-
-        Returns
-        -------
-        tuple
-            with (xmin,xmax,ymin,ymax,zmin,zmax)
-        """
-        return grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz))
 
     # --- private helper functions ---
     def _get_min_and_offset(self):
