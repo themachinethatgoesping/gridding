@@ -93,8 +93,8 @@ def get_grd_value(value: float, grd_val_min: float, grd_res: float) -> float:
 
 @njit
 def get_index_weights(fraction_index_x: float,
-                       fraction_index_y: float,
-                       fraction_index_z: float) -> tuple:
+                      fraction_index_y: float,
+                      fraction_index_z: float) -> tuple:
     """
     Return a vector with fraction and weights for the neighboring grid cells.
     """
@@ -142,12 +142,12 @@ def get_index_weights(fraction_index_x: float,
 
 @njit()
 def grd_weighted_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
-                       xmin: float, xres: float, nx: int,
-                       ymin: float, yres: float, ny: int,
-                       zmin: float, zres: float, nz: int,
-                       image_values: np.ndarray,
-                       image_weights: np.ndarray,
-                       skip_invalid: bool = True) -> tuple:
+                      xmin: float, xres: float, nx: int,
+                      ymin: float, yres: float, ny: int,
+                      zmin: float, zres: float, nz: int,
+                      image_values: np.ndarray,
+                      image_weights: np.ndarray,
+                      skip_invalid: bool = True) -> tuple:
 
     for i in range(len(sx)):
         x = sx[i]
@@ -156,9 +156,9 @@ def grd_weighted_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
         v = sv[i]
 
         IX, IY, IZ, WEIGHT = get_index_weights(
-           get_index_fraction(x, xmin, xres),
-           get_index_fraction(y, ymin, yres),
-           get_index_fraction(z, zmin, zres)
+            get_index_fraction(x, xmin, xres),
+            get_index_fraction(y, ymin, yres),
+            get_index_fraction(z, zmin, zres)
         )
 
         for i_ in range(len(IX)):
@@ -209,12 +209,12 @@ def grd_weighted_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
 
 @njit
 def grd_block_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
-                    xmin: float, xres: float, nx: int,
-                    ymin: float, yres: float, ny: int,
-                    zmin: float, zres: float, nz: int,
-                    image_values: np.ndarray,
-                    image_weights: np.ndarray,
-                    skip_invalid: bool = True) -> tuple:
+                   xmin: float, xres: float, nx: int,
+                   ymin: float, yres: float, ny: int,
+                   zmin: float, zres: float, nz: int,
+                   image_values: np.ndarray,
+                   image_weights: np.ndarray,
+                   skip_invalid: bool = True) -> tuple:
 
     for i in range(len(sx)):
         x = sx[i]
