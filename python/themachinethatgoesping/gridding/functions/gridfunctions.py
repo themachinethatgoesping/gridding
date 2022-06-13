@@ -94,7 +94,7 @@ def get_grd_value(value: float, grd_val_min: float, grd_res: float) -> float:
 @njit
 def get_index_weights(fraction_index_x: float,
                        fraction_index_y: float,
-                       fraction_index_z: float) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+                       fraction_index_z: float) -> tuple:
     """
     Return a vector with fraction and weights for the neighboring grid cells.
     """
