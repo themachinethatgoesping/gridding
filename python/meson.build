@@ -6,7 +6,7 @@
 sources = [
     'themachinethatgoesping/gridding/__init__.py',
     'themachinethatgoesping/gridding/echogrid.py',
-    'themachinethatgoesping/gridding/gridder.py',
+    'themachinethatgoesping/gridding/forwardgridder.py',
     'themachinethatgoesping/gridding/functions/__init__.py',
     'themachinethatgoesping/gridding/functions/gridfunctions.py',
     'themachinethatgoesping/gridding/functions/helperfunctions.py',

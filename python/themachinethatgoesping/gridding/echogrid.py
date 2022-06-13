@@ -3,21 +3,12 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-import math
-
-from matplotlib import pyplot as plt
-
 import numpy as np
-from tqdm.auto import tqdm
 
 from numba import njit
 
-from copy import deepcopy
-from collections import defaultdict
-from enum import IntEnum
-
-from .functions import helperfunctions as hlp
 from .functions import gridfunctions as gf
+from .forwardgridder import ForwardGridder
 
 from collections.abc import MutableMapping
 
@@ -107,7 +98,7 @@ class EchoGrid(object):
         return np.nansum(layerAvg[layerAvg >= min_val]) * self.ResX * self.ResY * self.ZDiff
 
     def getGridder(self):
-        return gf.GRIDDER(self.ResX, self.ResY, self.ResZ,
+        return ForwardGridder(self.ResX, self.ResY, self.ResZ,
                           self.MinX, self.MaxX,
                           self.MinY, self.MaxY,
                           self.MinZ, self.MaxZ)
@@ -120,7 +111,7 @@ class EchoGrid(object):
         minZ = gridder_old.get_z_grd_value(layer_z - (layer_size - gridder_old.zres) / 2)
         maxZ = gridder_old.get_z_grd_value(layer_z + (layer_size - gridder_old.zres) / 2)
 
-        gridder = gf.GRIDDER(self.ResX,self.ResY,self.ResZ,
+        gridder = ForwardGridder(self.ResX,self.ResY,self.ResZ,
                              self.MinX,self.MaxX,
                              self.MinY,self.MaxY,
                              minZ,maxZ)
@@ -133,7 +124,7 @@ class EchoGrid(object):
         imagesums = self.ImageSums[:,:,iz0:iz1+1]
         imagenums = self.ImageNums[:,:,iz0:iz1+1]
 
-        return ScatterGrid(imagesums,imagenums,gridder)
+        return EchoGrid(imagesums,imagenums,gridder)
 
     def getDepthMeanImage(self,layer_z,layer_size):
 
@@ -142,7 +133,7 @@ class EchoGrid(object):
         minZ = gridder_old.get_z_grd_value(layer_z - (layer_size - gridder_old.zres) / 2)
         maxZ = gridder_old.get_z_grd_value(layer_z + (layer_size - gridder_old.zres) / 2)
 
-        gridder = gf.GRIDDER(self.ResX,self.ResY,self.ResZ,
+        gridder = ForwardGridder(self.ResX,self.ResY,self.ResZ,
                              self.MinX,self.MaxX,
                              self.MinY,self.MaxY,
                              minZ,maxZ)
@@ -356,7 +347,7 @@ class EchoGrid(object):
         return figure,ax,image
 
 
-class ScatterGridDict(MutableMapping):
+class EchoGridDict(MutableMapping):
 
     def print(self, TrueValue):
         maxKeyLen = max([len(k) for k in self.keys()])
@@ -365,8 +356,7 @@ class ScatterGridDict(MutableMapping):
 
 
     def cutDepthLayer(self,layer_z,layer_size):
-        scd = ScatterGridDict()
-        try_layer_z = None
+        scd = EchoGridDict()
         for k in self.keys():
             scd[k] = self[k].cutDepthLayer(layer_z,layer_size)
 
@@ -386,18 +376,18 @@ class ScatterGridDict(MutableMapping):
         return self.store[key]
 
     def __setitem__(self, key, value):
-        if isinstance(value, ScatterGrid):
+        if isinstance(value, EchoGrid):
             self.store[key] = value
         else:
             try:
-                self.store[key] = ScatterGrid(*value)
+                self.store[key] = EchoGrid(*value)
             except:
                 try:
                     types = [type(v) for v in value]
                 except:
                     types = [type(value)]
 
-                raise RuntimeError("Cannot initialize ScatterGrid using arguments of type:",*types)
+                raise RuntimeError("Cannot initialize EchoGrid using arguments of type:",*types)
 
     def __delitem__(self, key):
         del self.store[key]
@@ -415,9 +405,9 @@ if __name__ == "__main__":
     imN = np.ones((10,10,10))
     imS = np.ones((10,10,10))
     gridder = gf.GRIDDER(1,1,1,0,1,0,1,0,1)
-    sc = ScatterGrid(imN,imS,gridder)
+    sc = EchoGrid(imN,imS,gridder)
 
-    scd = ScatterGridDict()
+    scd = EchoGridDict()
     scd['test'] = sc
     scd['test2'] = imN,imS,gridder
 

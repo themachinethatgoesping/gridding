@@ -7,3 +7,4 @@ from . import functions
 
 #modules
 from .echogrid import EchoGrid
+from .forwardgridder import ForwardGridder
