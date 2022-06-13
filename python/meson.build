@@ -4,12 +4,12 @@
 
 # -- python sources --
 sources = [
-    'themachinethatgoesping/echogrids/__init__.py',
-    'themachinethatgoesping/echogrids/echogrid.py',
-    'themachinethatgoesping/echogrids/gridder.py',
-    'themachinethatgoesping/echogrids/functions/__init__.py',
-    'themachinethatgoesping/echogrids/functions/gridfunctions.py',
-    'themachinethatgoesping/echogrids/functions/helperfunctions.py',
+    'themachinethatgoesping/gridding/__init__.py',
+    'themachinethatgoesping/gridding/echogrid.py',
+    'themachinethatgoesping/gridding/gridder.py',
+    'themachinethatgoesping/gridding/functions/__init__.py',
+    'themachinethatgoesping/gridding/functions/gridfunctions.py',
+    'themachinethatgoesping/gridding/functions/helperfunctions.py',
 ]
 
 pymod = import('python').find_installation(get_option('python_path'), required : get_option('build_pythonmodule'))
