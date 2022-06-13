@@ -7,5 +7,5 @@ SPDX-License-Identifier: CC0-1.0
   <img src="https://github.com/themachinethatgoesping/echogrids/actions/workflows/ci.yml/badge.svg" alt='CI status'/>
 </a>
 
-# echogrids
+# gridding
 Some python functions for gridding echo data
