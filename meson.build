@@ -16,8 +16,6 @@ project(
 
 projectnamespace = 'themachinethatgoesping'
  
-# add python files
+# add python src
 subdir('python')
 
-# add tests
-#subdir('tests')
