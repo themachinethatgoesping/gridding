@@ -70,7 +70,7 @@ jobs:
       if:  ${{matrix.dep}}
       run: ${{matrix.dep}}
       
-    - name: install dependcies (meson & pythone)
+    - name: install dependcies (meson & python)
       if:  ${{matrix.pip}}
       run: ${{matrix.pip}}
 
@@ -153,7 +153,7 @@ jobs:
 
     # same as for linux
 
-    - name: install dependcies (meson & pythone)
+    - name: install dependcies (meson & python)
       run: pip install meson ninja pytest
 
     - name: configure meson
