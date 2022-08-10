@@ -429,17 +429,17 @@ class ForwardGridder(object):
         return grdf.get_grd_value(z, self.zmin, self.zres)
 
     def get_extent_x(self) -> list:
-        """return x extend (usefull for plotting)
+        """return x extend (useful for plotting)
         """
         return [self.border_xmin, self.border_xmax]
 
     def get_extent_y(self) -> list:
-        """return y extend (usefull for plotting)
+        """return y extend (useful for plotting)
         """
         return [self.border_ymin, self.border_ymax]
 
     def get_extent_z(self) -> list:
-        """return z extend (usefull for plotting)
+        """return z extend (useful for plotting)
         """
         return [self.border_zmin, self.border_zmax]
 

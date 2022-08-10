@@ -14,7 +14,7 @@ from numba import njit
 
 from . import helperfunctions as hlp
 
-# --- some usefull functions ---
+# --- some useful functions ---
 
 
 @njit
