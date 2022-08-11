@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # test basic imports
-from matplotlib.pyplot import grid
 from themachinethatgoesping.gridding.forwardgridder import ForwardGridder
 
 import numpy as np
