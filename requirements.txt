@@ -1,5 +1,5 @@
 numpy
 numba
 matplotlib
-ipympl
+#ipympl
 tqdm
