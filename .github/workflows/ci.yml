@@ -122,7 +122,6 @@ jobs:
           boost-version_: [1_79_0]
           boost-modules: [--with-filesystem]
           
-    
     env:
       CC: msvc-14.3
 
@@ -145,6 +144,14 @@ jobs:
       with:
         submodules: recursive
         lfs: false
+
+    - name: sccache
+      if ${{ ccache }}
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ci-win       # name for the cache
+        variant: sccache  # supports windows
+
 
     - name: Cache Boost
       id: cache-boost
@@ -212,6 +219,12 @@ jobs:
       with:
         submodules: recursive
         lfs: false
+
+    - name: ccache
+      if ${{ ccache }}
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+        key: ci-mac  # name for the cache
         
     - run: brew install libomp boost
     
