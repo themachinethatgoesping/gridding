@@ -42,7 +42,7 @@ def static_get_target_pos(image,min_val = np.nan):
 
     return x_sum/x_weight, y_sum/y_weight, z_sum/z_weight
 
-class EchoGrid(object):
+class EchoGrid:
 
     def __init__(self, imagesums, imagenums, gridder):
         self.ImageSums = imagesums.copy()

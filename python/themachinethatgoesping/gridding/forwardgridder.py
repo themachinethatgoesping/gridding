@@ -3,22 +3,26 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
+# disable pylint warnings for too many arguments
+#pylint: disable=too-many-arguments
+
 """
 Simple gridder class that can create quantitative 3D images from x,z,y,val from some custom data.
 """
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 from .functions import gridfunctions as grdf
 
 
-class ForwardGridder(object):
+class ForwardGridder:
     """Simple class to generate 3D grids (images) and interpolate xyz data onto a grid using simple forward mapping algorithms.
     (e.g. block mean, weighted mean interpolation)
     """
 
     @classmethod
-    def from_data(cls, res: float, sx: np.array, sy: np.array, sz: np.array):
+    def from_data(cls, res: float, sx: ArrayLike, sy: ArrayLike, sz: ArrayLike):
         """Create gridder with resolution "res"
         xmin,xmax,ymin,ymax,zmin,zmax are determined to exactly contain the given data vectors (sx,sy,sz)
 
@@ -26,11 +30,11 @@ class ForwardGridder(object):
         ----------
         res : float
             x,y and z resolution of the grid
-        sx : np.array
+        sx : ArrayLike
             array with x data
-        sy : np.array
+        sy : ArrayLike
             array with y data
-        sz : np.array
+        sz : ArrayLike
             array with z data
 
         Returns
@@ -155,7 +159,7 @@ class ForwardGridder(object):
         self.border_zmax = self.zmax + self.zres / 2.0
 
     def get_empty_grd_images(self) -> tuple:
-        """create empty num and sum gridimages
+        """create empty num and sum grid images
 
         Returns
         -------
@@ -170,10 +174,10 @@ class ForwardGridder(object):
 
     def interpolate_block_mean(
         self,
-        sx: np.array,
-        sy: np.array,
-        sz: np.array,
-        s_val: np.array,
+        sx: ArrayLike,
+        sy: ArrayLike,
+        sz: ArrayLike,
+        s_val: ArrayLike,
         image_values: np.ndarray = None,
         image_weights: np.ndarray = None,
         skip_invalid: bool = True,
@@ -182,13 +186,13 @@ class ForwardGridder(object):
 
         Parameters
         ----------
-        sx : np.array
+        sx : ArrayLike
             x values
-        sy : np.array
+        sy : ArrayLike
             y values
-        sz : np.array
+        sz : ArrayLike
             z values
-        s_val : np.array
+        s_val : ArrayLike
             amplitudes / volume backscattering coefficients
         image_values : np.ndarray, optional
             Image with values. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
@@ -230,10 +234,10 @@ class ForwardGridder(object):
 
     def interpolate_weighted_mean(
         self,
-        sx: np.array,
-        sy: np.array,
-        sz: np.array,
-        s_val: np.array,
+        sx: ArrayLike,
+        sy: ArrayLike,
+        sz: ArrayLike,
+        s_val: ArrayLike,
         image_values: np.ndarray = None,
         image_weights: np.ndarray = None,
         skip_invalid: bool = True,
@@ -242,13 +246,13 @@ class ForwardGridder(object):
 
         Parameters
         ----------
-        sx : np.array
+        sx : ArrayLike
             x values
-        sy : np.array
+        sy : ArrayLike
             y values
-        sz : np.array
+        sz : ArrayLike
             z values
-        s_val : np.array
+        s_val : ArrayLike
             amplitudes / volume backscattering coefficients
         image_values : np.ndarray, optional
             Image with values. If None a new image will be created. Dimensions must fit the internal nx,ny,nz
@@ -289,17 +293,17 @@ class ForwardGridder(object):
         )
 
     @staticmethod
-    def get_minmax(sx: np.array, sy: np.array, sz: np.array) -> tuple:
+    def get_minmax(sx: ArrayLike, sy: ArrayLike, sz: ArrayLike) -> tuple:
         """returns the min/max value of three lists (same size).
-        Sometimes faster than seperate numpy functions because it only loops once.
+        Sometimes faster than separate numpy functions because it only loops once.
 
         Parameters
         ----------
-        sx : np.array
+        sx : ArrayLike
             1D array with x positions (same size)
-        sy : np.array
+        sy : ArrayLike
             1D array with x positions (same size)
-        sz : np.array
+        sz : ArrayLike
             1D array with x positions (same size)
 
         Returns
@@ -310,7 +314,7 @@ class ForwardGridder(object):
         return grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz))
 
     def get_x_index(self, x: float) -> int:
-        """get the x index of the gridcell that physically contains "x"
+        """get the x index of the grid cell that physically contains "x"
 
         Parameters
         ----------
@@ -323,7 +327,7 @@ class ForwardGridder(object):
         return grdf.get_index(x, self.xmin, self.xres)
 
     def get_y_index(self, y: float) -> int:
-        """get the y index of the gridcell that physically contains "x"
+        """get the y index of the grid cell that physically contains "x"
 
         Parameters
         ----------
@@ -336,7 +340,7 @@ class ForwardGridder(object):
         return grdf.get_index(y, self.ymin, self.yres)
 
     def get_z_index(self, z: float) -> int:
-        """get the y index of the gridcell that physically contains "z"
+        """get the y index of the grid cell that physically contains "z"
 
         Parameters
         ----------
