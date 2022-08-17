@@ -13,16 +13,12 @@ from .functions import gridfunctions as grdf
 
 
 class ForwardGridder(object):
-    """ Simple class to generate 3D grids (images) and interpolate xyz data ontothem using simple forwardmapping algorithms.
+    """Simple class to generate 3D grids (images) and interpolate xyz data onto a grid using simple forward mapping algorithms.
     (e.g. block mean, weighted mean interpolation)
     """
 
     @classmethod
-    def from_data(cls,
-                  res: float,
-                  sx: np.array,
-                  sy: np.array,
-                  sz: np.array):
+    def from_data(cls, res: float, sx: np.array, sy: np.array, sz: np.array):
         """Create gridder with resolution "res"
         xmin,xmax,ymin,ymax,zmin,zmax are determined to exactly contain the given data vectors (sx,sy,sz)
 
@@ -42,15 +38,22 @@ class ForwardGridder(object):
         ForwardGridder
             ForwardGridder object
         """
-        return cls.from_res(res, *grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz)))
+        return cls.from_res(
+            res, *grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz))
+        )
 
     # -- factory methods --
     @classmethod
-    def from_res(cls,
-                 res: float,
-                 min_x: float, max_x: float,
-                 min_y: float, max_y: float,
-                 min_z: float, max_z: float):
+    def from_res(
+        cls,
+        res: float,
+        min_x: float,
+        max_x: float,
+        min_y: float,
+        max_y: float,
+        min_z: float,
+        max_z: float,
+    ):
         """Create gridder setting xres,yres and zres to "res"
 
         Parameters
@@ -77,16 +80,21 @@ class ForwardGridder(object):
         """
         return cls(res, res, res, min_x, max_x, min_y, max_y, min_z, max_z)
 
-    def __init__(self,
-                 xres: float,
-                 yres: float,
-                 zres: float,
-                 min_x: float, max_x: float,
-                 min_y: float, max_y: float,
-                 min_z: float, max_z: float,
-                 xbase: float = 0.0,
-                 ybase: float = 0.0,
-                 zbase: float = 0.0):
+    def __init__(
+        self,
+        xres: float,
+        yres: float,
+        zres: float,
+        min_x: float,
+        max_x: float,
+        min_y: float,
+        max_y: float,
+        min_z: float,
+        max_z: float,
+        xbase: float = 0.0,
+        ybase: float = 0.0,
+        zbase: float = 0.0,
+    ):
         """Initialize forward gridder class using grid parameters.
 
         Parameters
@@ -134,9 +142,9 @@ class ForwardGridder(object):
         self.zmax = grdf.get_grd_value(max_z, zbase, zres)
 
         # compute the number of elements from (including) min_x, _y, _z to max_x, _y, _z
-        self.nx = int((self.xmax - self.xmin)/self.xres) + 1
-        self.ny = int((self.ymax - self.ymin)/self.yres) + 1
-        self.nz = int((self.zmax - self.zmin)/self.zres) + 1
+        self.nx = int((self.xmax - self.xmin) / self.xres) + 1
+        self.ny = int((self.ymax - self.ymin) / self.yres) + 1
+        self.nz = int((self.zmax - self.zmin) / self.zres) + 1
 
         # compute x,y,z borders (extend of the outest grid cells)
         self.border_xmin = self.xmin - self.xres / 2.0
@@ -151,21 +159,25 @@ class ForwardGridder(object):
 
         Returns
         -------
-        (image_values, image_weights): 
+        (image_values, image_weights):
             image_values: summed value for each grid position
             image_weights: weights for each grid position
         """
         image_values = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
-        image_weights = np.zeros(
-            (self.nx, self.ny, self.nz)).astype(np.float64)
+        image_weights = np.zeros((self.nx, self.ny, self.nz)).astype(np.float64)
 
         return image_values, image_weights
 
-    def interpolate_block_mean(self,
-                               sx: np.array, sy: np.array, sz: np.array, s_val: np.array,
-                               image_values: np.ndarray = None,
-                               image_weights: np.ndarray = None,
-                               skip_invalid: bool = True) -> tuple:
+    def interpolate_block_mean(
+        self,
+        sx: np.array,
+        sy: np.array,
+        sz: np.array,
+        s_val: np.array,
+        image_values: np.ndarray = None,
+        image_weights: np.ndarray = None,
+        skip_invalid: bool = True,
+    ) -> tuple:
         """interpolate 3D points onto 3d images using block mean interpolation
 
         Parameters
@@ -195,21 +207,37 @@ class ForwardGridder(object):
             image_weights, image_values = self.get_empty_grd_images()
         else:
             assert image_values.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
+                self.nx,
+                self.ny,
+                self.nz,
+            ), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
             assert image_weights.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
+                self.nx,
+                self.ny,
+                self.nz,
+            ), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
 
         return grdf.grd_block_mean(
-            np.array(sx), np.array(sy), np.array(sz), np.array(s_val),
+            np.array(sx),
+            np.array(sy),
+            np.array(sz),
+            np.array(s_val),
             *self._get_min_and_offset(),
-            image_values=image_values, image_weights=image_weights,
-            skip_invalid=skip_invalid)
+            image_values=image_values,
+            image_weights=image_weights,
+            skip_invalid=skip_invalid
+        )
 
-    def interpolate_weighted_mean(self,
-                                  sx: np.array, sy: np.array, sz: np.array, s_val: np.array,
-                                  image_values: np.ndarray = None,
-                                  image_weights: np.ndarray = None,
-                                  skip_invalid: bool = True):
+    def interpolate_weighted_mean(
+        self,
+        sx: np.array,
+        sy: np.array,
+        sz: np.array,
+        s_val: np.array,
+        image_values: np.ndarray = None,
+        image_weights: np.ndarray = None,
+        skip_invalid: bool = True,
+    ):
         """interpolate 3D points onto 3d images using weighted mean interpolation
 
         Parameters
@@ -239,21 +267,30 @@ class ForwardGridder(object):
             image_weights, image_values = self.get_empty_grd_images()
         else:
             assert image_values.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
+                self.nx,
+                self.ny,
+                self.nz,
+            ), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
             assert image_weights.shape == (
-                self.nx, self.ny, self.nz), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
+                self.nx,
+                self.ny,
+                self.nz,
+            ), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
 
         return grdf.grd_weighted_mean(
-            np.array(sx), np.array(sy), np.array(sz), np.array(s_val),
+            np.array(sx),
+            np.array(sy),
+            np.array(sz),
+            np.array(s_val),
             *self._get_min_and_offset(),
-            image_values=image_values, image_weights=image_weights,
-            skip_invalid=skip_invalid)
+            image_values=image_values,
+            image_weights=image_weights,
+            skip_invalid=skip_invalid
+        )
 
     @staticmethod
-    def get_minmax(sx: np.array,
-                   sy: np.array,
-                   sz: np.array) -> tuple:
-        """returns the min/max value of three lists (same size). 
+    def get_minmax(sx: np.array, sy: np.array, sz: np.array) -> tuple:
+        """returns the min/max value of three lists (same size).
         Sometimes faster than seperate numpy functions because it only loops once.
 
         Parameters
@@ -303,7 +340,7 @@ class ForwardGridder(object):
 
         Parameters
         ----------
-        z : float            
+        z : float
 
         Returns
         -------
@@ -429,23 +466,19 @@ class ForwardGridder(object):
         return grdf.get_grd_value(z, self.zmin, self.zres)
 
     def get_extent_x(self) -> list:
-        """return x extend (useful for plotting)
-        """
+        """return x extend (useful for plotting)"""
         return [self.border_xmin, self.border_xmax]
 
     def get_extent_y(self) -> list:
-        """return y extend (useful for plotting)
-        """
+        """return y extend (useful for plotting)"""
         return [self.border_ymin, self.border_ymax]
 
     def get_extent_z(self) -> list:
-        """return z extend (useful for plotting)
-        """
+        """return z extend (useful for plotting)"""
         return [self.border_zmin, self.border_zmax]
 
     def get_x_coordinates(self) -> list:
-        """return valid x grid coordinates as list
-        """
+        """return valid x grid coordinates as list"""
         coordinates = []
         for i in range(self.nx):
             coordinates.append(self.get_x_value(i))
@@ -453,8 +486,7 @@ class ForwardGridder(object):
         return coordinates
 
     def get_y_coordinates(self) -> list:
-        """return valid y grid coordinates as list
-        """
+        """return valid y grid coordinates as list"""
         coordinates = []
         for i in range(self.ny):
             coordinates.append(self.get_y_value(i))
@@ -462,8 +494,7 @@ class ForwardGridder(object):
         return coordinates
 
     def get_z_coordinates(self) -> list:
-        """return valid z grid coordinates as list
-        """
+        """return valid z grid coordinates as list"""
         coordinates = []
         for i in range(self.nz):
             coordinates.append(self.get_z_value(i))
@@ -472,4 +503,14 @@ class ForwardGridder(object):
 
     # --- private helper functions ---
     def _get_min_and_offset(self):
-        return self.xmin, self.xres, self.nx, self.ymin, self.yres, self.ny, self.zmin, self.zres, self.nz
+        return (
+            self.xmin,
+            self.xres,
+            self.nx,
+            self.ymin,
+            self.yres,
+            self.ny,
+            self.zmin,
+            self.zres,
+            self.nz,
+        )

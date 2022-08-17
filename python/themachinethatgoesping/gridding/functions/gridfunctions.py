@@ -22,7 +22,7 @@ def get_minmax(sx: np.array,
                sy: np.array,
                sz: np.array) -> tuple:
     """returns the min/max value of three lists (same size). 
-    Sometimes faster than seperate numpy functions because it only loops once.
+    Sometimes faster than separate numpy functions because it only loops once.
 
     Parameters
     ----------
