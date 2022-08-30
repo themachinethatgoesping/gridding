@@ -9,4 +9,4 @@ from . import functions
 from .echogrid import EchoGrid
 from .forwardgridder import ForwardGridder
 
-__version__ = "@PROJECT_VERSION@"
+__version__ = "0.0.1.6-1"
