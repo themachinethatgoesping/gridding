@@ -18,10 +18,8 @@ from . import helperfunctions as hlp
 
 
 @njit
-def get_minmax(sx: np.array,
-               sy: np.array,
-               sz: np.array) -> tuple:
-    """returns the min/max value of three lists (same size). 
+def get_minmax(sx: np.array, sy: np.array, sz: np.array) -> tuple:
+    """returns the min/max value of three lists (same size).
     Sometimes faster than separate numpy functions because it only loops once.
 
     Parameters
@@ -39,8 +37,7 @@ def get_minmax(sx: np.array,
         with (xmin,xmax,ymin,ymax,zmin,zmax)
     """
 
-    assert len(sx) == len(sy) == len(
-        sz), "expected length of all arrays to be the same"
+    assert len(sx) == len(sy) == len(sz), "expected length of all arrays to be the same"
 
     minx = np.nan
     maxx = np.nan
@@ -92,9 +89,9 @@ def get_grd_value(value: float, grd_val_min: float, grd_res: float) -> float:
 
 
 @njit
-def get_index_weights(fraction_index_x: float,
-                      fraction_index_y: float,
-                      fraction_index_z: float) -> tuple:
+def get_index_weights(
+    fraction_index_x: float, fraction_index_y: float, fraction_index_z: float
+) -> tuple:
     """
     Return a vector with fraction and weights for the neighboring grid cells.
     """
@@ -126,28 +123,41 @@ def get_index_weights(fraction_index_x: float,
     vixy = vix * fraction_y
     vixiy = vix * ifraction_y
 
-    WEIGHT = np.array([
-        vxy * fraction_z,
-        vxy * ifraction_z,
-        vxiy * fraction_z,
-        vxiy * ifraction_z,
-        vixy * fraction_z,
-        vixy * ifraction_z,
-        vixiy * fraction_z,
-        vixiy * ifraction_z
-    ])
+    WEIGHT = np.array(
+        [
+            vxy * fraction_z,
+            vxy * ifraction_z,
+            vxiy * fraction_z,
+            vxiy * ifraction_z,
+            vixy * fraction_z,
+            vixy * ifraction_z,
+            vixiy * fraction_z,
+            vixiy * ifraction_z,
+        ]
+    )
 
     return X, Y, Z, WEIGHT
 
 
 @njit()
-def grd_weighted_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
-                      xmin: float, xres: float, nx: int,
-                      ymin: float, yres: float, ny: int,
-                      zmin: float, zres: float, nz: int,
-                      image_values: np.ndarray,
-                      image_weights: np.ndarray,
-                      skip_invalid: bool = True) -> tuple:
+def grd_weighted_mean(
+    sx: np.array,
+    sy: np.array,
+    sz: np.array,
+    sv: np.array,
+    xmin: float,
+    xres: float,
+    nx: int,
+    ymin: float,
+    yres: float,
+    ny: int,
+    zmin: float,
+    zres: float,
+    nz: int,
+    image_values: np.ndarray,
+    image_weights: np.ndarray,
+    skip_invalid: bool = True,
+) -> tuple:
 
     for i in range(len(sx)):
         x = sx[i]
@@ -158,7 +168,7 @@ def grd_weighted_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
         IX, IY, IZ, WEIGHT = get_index_weights(
             get_index_fraction(x, xmin, xres),
             get_index_fraction(y, ymin, yres),
-            get_index_fraction(z, zmin, zres)
+            get_index_fraction(z, zmin, zres),
         )
 
         for i_ in range(len(IX)):
@@ -208,13 +218,24 @@ def grd_weighted_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
 
 
 @njit
-def grd_block_mean(sx: np.array, sy: np.array, sz: np.array, sv: np.array,
-                   xmin: float, xres: float, nx: int,
-                   ymin: float, yres: float, ny: int,
-                   zmin: float, zres: float, nz: int,
-                   image_values: np.ndarray,
-                   image_weights: np.ndarray,
-                   skip_invalid: bool = True) -> tuple:
+def grd_block_mean(
+    sx: np.array,
+    sy: np.array,
+    sz: np.array,
+    sv: np.array,
+    xmin: float,
+    xres: float,
+    nx: int,
+    ymin: float,
+    yres: float,
+    ny: int,
+    zmin: float,
+    zres: float,
+    nz: int,
+    image_values: np.ndarray,
+    image_weights: np.ndarray,
+    skip_invalid: bool = True,
+) -> tuple:
 
     for i in range(len(sx)):
         x = sx[i]

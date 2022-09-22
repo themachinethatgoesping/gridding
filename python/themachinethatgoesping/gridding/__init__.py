@@ -2,10 +2,10 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-#folders
+# folders
 from . import functions
 
-#modules
+# modules
 from .echogrid import EchoGrid
 from .forwardgridder import ForwardGridder
 

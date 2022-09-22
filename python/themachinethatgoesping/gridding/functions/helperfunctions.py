@@ -18,7 +18,7 @@ M_PI_2 = math.pi / 2
 M_2_PI = 2 * math.pi
 M_PI_180 = math.pi / 180
 
-MIN_DB_VALUE: float = -50.
+MIN_DB_VALUE: float = -50.0
 
 # ------------------- Functions -------------------
 # Use this instead of the python internal
@@ -28,6 +28,7 @@ def round_int(val: float) -> int:
     # instead of pythons bankers rounding
 
     return int(math.copysign(math.floor(math.fabs(val) + 0.5), val))
+
 
 # Some testing
 if __name__ == "__main__":

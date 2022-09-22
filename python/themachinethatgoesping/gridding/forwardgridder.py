@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # disable pylint warnings for too many arguments
-#pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments
 
 """
 Simple gridder class that can create quantitative 3D images from x,z,y,val from some custom data.
