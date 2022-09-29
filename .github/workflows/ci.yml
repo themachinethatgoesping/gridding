@@ -231,6 +231,8 @@ jobs:
       with:
         key: ci-mac  # name for the cache
         
+    # install clang 14
+    - run: brew install llvm@14
     - run: brew install libomp boost
     
     - run: pip install meson ninja pytest
