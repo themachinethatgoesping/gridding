@@ -210,9 +210,6 @@ jobs:
   macos:
     name: Build and install with meson on macOS
     runs-on: macos-latest
-    
-    env:
-      CC: msvc-14.3
       
     steps:
     
@@ -233,6 +230,7 @@ jobs:
         
     # install clang 14
     - run: brew install llvm@14
+        
     - run: brew install libomp boost
     
     - run: pip install meson ninja pytest
