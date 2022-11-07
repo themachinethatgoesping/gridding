@@ -14,9 +14,6 @@ sources = [
 
            
 if get_option('build_pythonmodule').enabled()
-
-    # get the python module
-    pymod = import('python').find_installation(get_option('python_path'), required : get_option('build_pythonmodule'))
         
     #install headers
     if get_option('pydev_install').disabled() #don't install if pydev_install is activated
