@@ -20,6 +20,7 @@ magic_enum*
 bitsery*
 xtensor*
 xsimd*
+xtensor-python*
 fast_float*
 nlohman*
 indicators*
