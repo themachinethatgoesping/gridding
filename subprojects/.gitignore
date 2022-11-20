@@ -24,6 +24,7 @@ xtensor-python*
 fast_float*
 nlohman*
 indicators*
+xxhash_cpp*
 
 #inherited repos
 tools-*
