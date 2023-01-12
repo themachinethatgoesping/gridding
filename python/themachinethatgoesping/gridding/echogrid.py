@@ -155,8 +155,8 @@ class EchoGrid:
         iz0 = gridder_old.get_z_index(minZ)
         iz1 = gridder_old.get_z_index(maxZ)
 
-        imagesums = self.ImageSums[:, :, iz0 : iz1 + 1]
-        imagenums = self.ImageNums[:, :, iz0 : iz1 + 1]
+        imagesums = self.ImageSums[:, :, iz0: iz1 + 1]
+        imagenums = self.ImageNums[:, :, iz0: iz1 + 1]
 
         return EchoGrid(imagesums, imagenums, gridder)
 
@@ -186,8 +186,8 @@ class EchoGrid:
         iz0 = gridder_old.get_z_index(minZ)
         iz1 = gridder_old.get_z_index(maxZ)
 
-        imagesums = self.ImageSums[:, :, iz0 : iz1 + 1]
-        imagenums = self.ImageNums[:, :, iz0 : iz1 + 1]
+        imagesums = self.ImageSums[:, :, iz0: iz1 + 1]
+        imagenums = self.ImageNums[:, :, iz0: iz1 + 1]
 
         return imagesums, imagenums, gridder
 
@@ -382,7 +382,7 @@ class EchoGrid:
                 image = getNanSum(self.ImageAvg.copy(), axis=2)
             elif zindex is None and zindeces is not None:
                 image = getNanSum(
-                    self.ImageAvg[:, :, zindeces[0] : zindeces[1] + 1], axis=2
+                    self.ImageAvg[:, :, zindeces[0]: zindeces[1] + 1], axis=2
                 )  # ,divide=abs(zindeces[1]-zindeces[0]))
 
             else:
