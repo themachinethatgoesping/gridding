@@ -126,15 +126,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        boost-version: [1.79.0]
-        boost-version_: [1_79_0]
+        boost-version: [1.81.0]
+        boost-version_: [1_81_0]
         boost-modules: [--with-iostreams]
-        toolset: [clang-cl]
+        include:
+          - toolset: clang-cl
+            compiler: sccache clang-cl
+            cpp_std: c++latest
+          # - toolset: msvc
+          #   compiler: sccache cl
+          #   cpp_std: c++20
+            
           
     env:
       #CC: msvc-14.32
-      CC: sccache ${{matrix.toolset}}
-      CXX: sccache ${{matrix.toolset}}
+      CC: ${{matrix.compiler}}
+      CXX: ${{matrix.compiler}}
 
     runs-on: windows-latest
     #container: python:latest #pull directly from dockerhub   
@@ -150,10 +157,10 @@ jobs:
         version: latest
     
     # make sure meson can find msvc
-    - name: Prepare MSVC
-      uses: bus1/cabuild/action/msdevshell@v1
+    - uses: TheMrMilchmann/setup-msvc-dev@v2
       with:
-        architecture: x64
+        arch: x64
+        #toolset: 14.34
 
     - name: checkout main repository
       uses: actions/checkout@v3
@@ -194,7 +201,7 @@ jobs:
 
     - name: configure meson
       run: |
-        meson setup builddir/ -D"python.install_env=auto" -Ddefault_library=static -D"python.install_env=auto"
+        meson setup builddir/ -D"python.install_env=auto" -Ddefault_library=static -D"python.install_env=auto" -Dcpp_std=${{matrix.cpp_std}}
 
     - name: compile project
       run: meson compile -C builddir/
