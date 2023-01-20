@@ -10,7 +10,7 @@ project(
   license: 'MPL-2.0',
 
   version: '0.1.2',
-  default_options: ['warning_level=2', 'buildtype=release', 'cpp_std=c++20'],
+  default_options: ['warning_level=2', 'buildtype=release', 'cpp_std=c++17'],
   meson_version: '>=1.0' #force new meson version to limit necessary testing
 )
 
