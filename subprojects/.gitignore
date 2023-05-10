@@ -17,7 +17,6 @@ pybind11*
 eigen*
 fmt*
 magic_enum*
-bitsery*
 xtensor*
 xsimd*
 xtensor-python*
