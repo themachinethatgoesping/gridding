@@ -48,7 +48,7 @@ class EchoGrid:
     def __init__(self, imagesums, imagenums, gridder):
         self.ImageSums = imagesums.copy()
         self.ImageNums = imagenums.copy()
-        self.ImageAvg = np.empty(imagenums.shape, dtype=np.float)
+        self.ImageAvg = np.empty(imagenums.shape, dtype=np.float64)
         self.ImageAvg.fill(np.nan)
 
         self.ImageAvg[imagenums > 0] = (
