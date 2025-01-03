@@ -210,7 +210,8 @@ def grd_weighted_mean(
                     continue
 
             # print(ix,iy,iz,v,w)
-            if v >= 0:
+            #if v >= 0:
+            if np.isfinite(v):
                 image_values[ix][iy][iz] += v * w
                 image_weights[ix][iy][iz] += w
 
@@ -276,7 +277,8 @@ def grd_block_mean(
             if abs(iz) >= nz:
                 continue
 
-        if v >= 0:
+        #if v >= 0:
+        if np.isfinite(v):
             image_values[ix][iy][iz] += v
             image_weights[ix][iy][iz] += 1
 
