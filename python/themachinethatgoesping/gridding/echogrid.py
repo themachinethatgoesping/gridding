@@ -45,6 +45,13 @@ def static_get_target_pos(image, min_val=np.nan):
 
 
 class EchoGrid:
+    
+    @classmethod
+    def from_data(cls, res, sx, sy, sz, sv):
+        gridder = ForwardGridder.from_data(res, sx, sy, sz)
+        imagesums, imagenumes = gridder.interpolate_weighted_mean(sx,sy,sz,sv)
+        return cls(imagesums, imagenumes, gridder)
+    
     def __init__(self, imagesums, imagenums, gridder):
         self.ImageSums = imagesums.copy()
         self.ImageNums = imagenums.copy()
