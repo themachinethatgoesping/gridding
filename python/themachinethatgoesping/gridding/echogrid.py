@@ -211,8 +211,19 @@ class EchoGrid:
 
         return image_sums, image_nums, gridder
 
-    def get_grid_extents(self):
-        return self.extent_x, self.extent_y, self.extent_z
+    def get_grid_extent(self, axis='xyz'):
+        extent = []
+        for ax in axis:
+            match ax:
+                case 'x':
+                    extent.extend(self.extent_x)
+                case 'y':
+                    extent.extend(self.extent_y)
+                case 'z':
+                    extent.extend(self.extent_z)
+                case _:
+                    raise ValueError(f"Invalid axis: {ax}. Use 'x', 'y', or 'z'.")
+        return tuple(extent)
 
     def to_string(self, TrueValue, methodName=None, minMethodNameSize=None):
 
@@ -306,7 +317,7 @@ class EchoGrid:
             axes = figure.subplots(ncols=nplots)
 
         axit = iter(axes)
-        image_extent_x, image_extent_y, image_extent_z = self.get_grid_extents()
+        image_extent_x, image_extent_y, image_extent_z = self.get_grid_extent()
 
         def get_nan_sum(imageLin, axis, divide=1):
             # image = np.nansum(imageLin,axis=axis)

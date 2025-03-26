@@ -480,6 +480,21 @@ class ForwardGridder:
     def get_extent_z(self) -> list:
         """return z extend (useful for plotting)"""
         return [self.border_zmin, self.border_zmax]
+    
+    def get_extent(self, axis: str = 'xyz') -> list:
+        """return x,y,z extend (useful for plotting)"""
+        extent = []
+        for ax in axis:
+            match ax:
+                case 'x':
+                    extent.extend(self.get_extent_x())
+                case 'y':
+                    extent.extend(self.get_extent_y())
+                case 'z':
+                    extent.extend(self.get_extent_z())
+                case _:
+                    raise ValueError(f"Invalid axis {ax}. Only 'x', 'y' and 'z' are allowed.")
+        return tuple(extent)
 
     def get_x_coordinates(self) -> list:
         """return valid x grid coordinates as list"""
