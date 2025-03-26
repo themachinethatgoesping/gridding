@@ -436,55 +436,6 @@ class EchoGrid:
         return figure, ax, image
 
 
-class EchoGridDict(MutableMapping):
-    def print(self, TrueValue):
-        maxKeyLen = max([len(k) for k in self.keys()])
-        for k in self.keys():
-            self.store[k].print(TrueValue, k, maxKeyLen)
-
-    def cut_depth_layer(self, layer_z, layer_size):
-        scd = EchoGridDict()
-        for k in self.keys():
-            scd[k] = self[k].cut_depth_layer(layer_z, layer_size)
-
-        z_extend = scd[k].extent_z
-        true_layer_size_z = abs(z_extend[1] - z_extend[0])
-        z_coordinates = scd[k].get_gridder().get_z_coordinates()
-
-        return scd, (z_extend, true_layer_size_z, z_coordinates)
-
-    def __init__(self, *args, **kwargs):
-        self.store = dict()
-        self.update(dict(*args, **kwargs))  # use the free update to set keys
-
-    def __getitem__(self, key):
-        return self.store[key]
-
-    def __setitem__(self, key, value):
-        if isinstance(value, EchoGrid):
-            self.store[key] = value
-        else:
-            try:
-                self.store[key] = EchoGrid(*value)
-            except:
-                try:
-                    types = [type(v) for v in value]
-                except:
-                    types = [type(value)]
-
-                raise RuntimeError(
-                    "Cannot initialize EchoGrid using arguments of type:", *types
-                )
-
-    def __delitem__(self, key):
-        del self.store[key]
-
-    def __iter__(self):
-        return iter(self.store)
-
-    def __len__(self):
-        return len(self.store)
-
 
 if __name__ == "__main__":
 
@@ -493,7 +444,6 @@ if __name__ == "__main__":
     gridder = gf.GRIDDER(1, 1, 1, 0, 1, 0, 1, 0, 1)
     sc = EchoGrid(imN, imS, gridder)
 
-    scd = EchoGridDict()
     scd["test"] = sc
     scd["test2"] = imN, imS, gridder
 
