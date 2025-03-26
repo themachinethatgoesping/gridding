@@ -50,22 +50,22 @@ class EchoGrid:
     def from_data(cls, res, sx, sy, sz, sv, blockmean=False):
         gridder = ForwardGridder.from_data(res, sx, sy, sz)
         if blockmean:
-            imagesums, imagenumes = gridder.interpolate_block_mean(sx,sy,sz,sv)
+            image_sums, imagenumes = gridder.interpolate_block_mean(sx,sy,sz,sv)
         else:
-            imagesums, imagenumes = gridder.interpolate_weighted_mean(sx,sy,sz,sv)
-        return cls(imagesums, imagenumes, gridder)
+            image_sums, imagenumes = gridder.interpolate_weighted_mean(sx,sy,sz,sv)
+        return cls(image_sums, imagenumes, gridder)
     
-    def __init__(self, imagesums, imagenums, gridder):
-        self.ImageSums = imagesums.copy()
-        self.ImageNums = imagenums.copy()
-        self.ImageAvg = np.empty(imagenums.shape, dtype=np.float64)
-        self.ImageAvg.fill(np.nan)
+    def __init__(self, image_sums, image_nums, gridder):
+        self.image_sums = image_sums.copy()
+        self.image_nums = image_nums.copy()
+        self.image_avg = np.empty(image_nums.shape, dtype=np.float64)
+        self.image_avg.fill(np.nan)
 
-        self.ImageAvg[imagenums > 0] = (
-            imagesums[imagenums > 0] / imagenums[imagenums > 0]
+        self.image_avg[image_nums > 0] = (
+            image_sums[image_nums > 0] / image_nums[image_nums > 0]
         )
 
-        self.TotalValue = np.nansum(self.ImageAvg) * (
+        self.total_value = np.nansum(self.image_avg) * (
             gridder.xres * gridder.yres * gridder.zres
         )
 
@@ -73,141 +73,151 @@ class EchoGrid:
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
-            self.TotalValueLayer = (
-                np.nansum(np.nanmean(self.ImageAvg, axis=2))
+            self.total_value_layer = (
+                np.nansum(np.nanmean(self.image_avg, axis=2))
                 * gridder.xres
                 * gridder.yres
                 * self.ZDiff
             )
 
         # self.Gridder = gridder
-        self.ExtentX = gridder.get_extent_x()
-        self.ExtentY = gridder.get_extent_y()
-        self.ExtentZ = gridder.get_extent_z()
-        self.ResX = gridder.xres
-        self.ResY = gridder.yres
-        self.ResZ = gridder.zres
-        self.MinX = gridder.xmin
-        self.MaxX = gridder.xmax
-        self.MinY = gridder.ymin
-        self.MaxY = gridder.ymax
-        self.MinZ = gridder.zmin
-        self.MaxZ = gridder.zmax
+        self.extent_x = gridder.get_extent_x()
+        self.extent_y = gridder.get_extent_y()
+        self.extent_z = gridder.get_extent_z()
+        self.res_x = gridder.xres
+        self.res_y = gridder.yres
+        self.res_z = gridder.zres
+        self.min_x = gridder.xmin
+        self.max_x = gridder.xmax
+        self.min_y = gridder.ymin
+        self.max_y = gridder.ymax
+        self.min_z = gridder.zmin
+        self.max_z = gridder.zmax
 
     def get_target_pos(self, min_val=np.nan):
-        xi, yi, zi = static_get_target_pos(self.ImageAvg, min_val)
+        xi, yi, zi = static_get_target_pos(self.image_avg, min_val)
 
         return (
-            xi * self.ResX + self.MinX,
-            yi * self.ResY + self.MinY,
-            zi * self.ResZ + self.MinZ,
+            xi * self.res_x + self.min_x,
+            yi * self.res_y + self.min_y,
+            zi * self.res_z + self.min_z,
         )
 
-    def getTotalvalue(self, min_val):
+    def get_total_value(self, min_val):
         if not np.isfinite(min_val):
-            return self.TotalValue
+            return self.total_value
 
-        return np.nansum(self.ImageAvg[self.ImageAvg >= min_val]) * (
-            self.ResX * self.ResY * self.ResZ
+        return np.nansum(self.image_avg[self.image_avg >= min_val]) * (
+            self.res_x * self.res_y * self.res_z
         )
 
-    def getTotalvalueLayer(self, min_val):
+    def get_total_value_layer(self, min_val):
         if not np.isfinite(min_val):
-            return self.TotalValueLayer
+            return self.total_value_layer
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
-            layerAvg = np.nanmean(self.ImageAvg, axis=2)
+            layerAvg = np.nanmean(self.image_avg, axis=2)
 
         return (
             np.nansum(layerAvg[layerAvg >= min_val])
-            * self.ResX
-            * self.ResY
+            * self.res_x
+            * self.res_y
             * self.ZDiff
         )
 
-    def getGridder(self):
+    def get_gridder(self):
         return ForwardGridder(
-            self.ResX,
-            self.ResY,
-            self.ResZ,
-            self.MinX,
-            self.MaxX,
-            self.MinY,
-            self.MaxY,
-            self.MinZ,
-            self.MaxZ,
+            self.res_x,
+            self.res_y,
+            self.res_z,
+            self.min_x,
+            self.max_x,
+            self.min_y,
+            self.max_y,
+            self.min_z,
+            self.max_z,
         )
 
-    def cutDepthLayer(self, layer_z, layer_size):
+    def cut_by_layer_size(self, layer_z, layer_size):
+        gridder_old = self.get_gridder()
 
-        gridder_old = self.getGridder()
-
-        minZ = gridder_old.get_z_grd_value(
+        min_z = gridder_old.get_z_grd_value(
             layer_z - (layer_size - gridder_old.zres) / 2
         )
-        maxZ = gridder_old.get_z_grd_value(
+        max_z = gridder_old.get_z_grd_value(
+            layer_z + (layer_size - gridder_old.zres) / 2
+        )
+        
+        return self.cut_by_layer_extent(min_z, max_z)
+
+    def cut_by_layer_extent(self, min_z = None, max_z = None):
+        gridder_old = self.get_gridder()
+        
+        if min_z is None:
+            min_z = self.min_z
+            
+        if max_z is None:
+            max_z = self.max_z
+        
+        gridder = ForwardGridder(
+            self.res_x,
+            self.res_y,
+            self.res_z,
+            self.min_x,
+            self.max_x,
+            self.min_y,
+            self.max_y,
+            min_z,
+            max_z,
+        )
+
+        iz0 = gridder_old.get_z_index(min_z)
+        iz1 = gridder_old.get_z_index(max_z)
+
+        image_sums = self.image_sums[:, :, iz0: iz1 + 1]
+        image_nums = self.image_nums[:, :, iz0: iz1 + 1]
+
+        return EchoGrid(image_sums, image_nums, gridder)
+
+    def get_depth_mean_image(self, layer_z, layer_size):
+
+        gridder_old = self.get_gridder()
+
+        min_z = gridder_old.get_z_grd_value(
+            layer_z - (layer_size - gridder_old.zres) / 2
+        )
+        max_z = gridder_old.get_z_grd_value(
             layer_z + (layer_size - gridder_old.zres) / 2
         )
 
         gridder = ForwardGridder(
-            self.ResX,
-            self.ResY,
-            self.ResZ,
-            self.MinX,
-            self.MaxX,
-            self.MinY,
-            self.MaxY,
-            minZ,
-            maxZ,
+            self.res_x,
+            self.res_y,
+            self.res_z,
+            self.min_x,
+            self.max_x,
+            self.min_y,
+            self.max_y,
+            min_z,
+            max_z,
         )
 
-        iz0 = gridder_old.get_z_index(minZ)
-        iz1 = gridder_old.get_z_index(maxZ)
+        iz0 = gridder_old.get_z_index(min_z)
+        iz1 = gridder_old.get_z_index(max_z)
 
-        imagesums = self.ImageSums[:, :, iz0: iz1 + 1]
-        imagenums = self.ImageNums[:, :, iz0: iz1 + 1]
+        image_sums = self.image_sums[:, :, iz0: iz1 + 1]
+        image_nums = self.image_nums[:, :, iz0: iz1 + 1]
 
-        return EchoGrid(imagesums, imagenums, gridder)
+        return image_sums, image_nums, gridder
 
-    def getDepthMeanImage(self, layer_z, layer_size):
+    def get_grid_extents(self):
+        return self.extent_x, self.extent_y, self.extent_z
 
-        gridder_old = self.getGridder()
-
-        minZ = gridder_old.get_z_grd_value(
-            layer_z - (layer_size - gridder_old.zres) / 2
-        )
-        maxZ = gridder_old.get_z_grd_value(
-            layer_z + (layer_size - gridder_old.zres) / 2
-        )
-
-        gridder = ForwardGridder(
-            self.ResX,
-            self.ResY,
-            self.ResZ,
-            self.MinX,
-            self.MaxX,
-            self.MinY,
-            self.MaxY,
-            minZ,
-            maxZ,
-        )
-
-        iz0 = gridder_old.get_z_index(minZ)
-        iz1 = gridder_old.get_z_index(maxZ)
-
-        imagesums = self.ImageSums[:, :, iz0: iz1 + 1]
-        imagenums = self.ImageNums[:, :, iz0: iz1 + 1]
-
-        return imagesums, imagenums, gridder
-
-    def getGridExtents(self):
-        return self.ExtentX, self.ExtentY, self.ExtentZ
-
-    def toString(self, TrueValue, methodName=None, minMethodNameSize=None):
+    def to_string(self, TrueValue, methodName=None, minMethodNameSize=None):
 
         if methodName is None:
-            prefix = "TotalValue"
+            prefix = "total_value"
         else:
             prefix = "Bubbles Grid"
             if minMethodNameSize:
@@ -218,17 +228,17 @@ class EchoGrid:
                 prefix += "[{}]".format(methodName)
 
         string = prefix + ": {:15.2f}  | {:5.2f} %".format(
-            round(self.TotalValue, 2), round(100 * (self.TotalValue / TrueValue - 1), 2)
+            round(self.total_value, 2), round(100 * (self.total_value / TrueValue - 1), 2)
         )
         return string
 
     def print(self, methodName, minMethodNameSize, TrueValue):
-        print(self.toString(methodName, minMethodNameSize, TrueValue))
+        print(self.to_string(methodName, minMethodNameSize, TrueValue))
 
-    def get_3DImage(self, toDb=True, minDbVal=-50):
+    def get_image(self, toDb=True, minDbVal=-50):
 
-        image = self.ImageAvg.copy()
-        image[self.ImageNums == 0] = np.nan
+        image = self.image_avg.copy()
+        image[self.image_nums == 0] = np.nan
         if toDb:
             image[image == 0] = 0.000000000000001
             image = 10 * np.log10(image)
@@ -296,12 +306,12 @@ class EchoGrid:
             axes = figure.subplots(ncols=nplots)
 
         axit = iter(axes)
-        image_extent_x, image_extent_y, image_extent_z = self.getGridExtents()
+        image_extent_x, image_extent_y, image_extent_z = self.get_grid_extents()
 
-        def getNanSum(imageLin, axis, divide=1):
+        def get_nan_sum(imageLin, axis, divide=1):
             # image = np.nansum(imageLin,axis=axis)
             image = np.nanmean(imageLin, axis=axis)
-            num = np.nansum(self.ImageNums, axis=axis)
+            num = np.nansum(self.image_nums, axis=axis)
 
             if divide != 1:
                 image /= divide
@@ -322,9 +332,9 @@ class EchoGrid:
             ax = next(axit)
 
             if xindex is None:
-                image = getNanSum(self.ImageAvg.copy(), axis=0)
+                image = get_nan_sum(self.image_avg.copy(), axis=0)
             else:
-                image = self.ImageAvg[xindex, :, :]
+                image = self.image_avg[xindex, :, :]
                 if toDb:
                     image[image == 0] = 0.000000000000001
                     image = 10 * np.log10(image)
@@ -356,9 +366,9 @@ class EchoGrid:
             ax = next(axit)
 
             if yindex is None:
-                image = getNanSum(self.ImageAvg.copy(), axis=1)
+                image = get_nan_sum(self.image_avg.copy(), axis=1)
             else:
-                image = self.ImageAvg[:, yindex, :]
+                image = self.image_avg[:, yindex, :]
                 if toDb:
                     image[image == 0] = 0.000000000000001
                     image = 10 * np.log10(image)
@@ -389,14 +399,14 @@ class EchoGrid:
             ax = next(axit)
 
             if zindex is None and zindeces is None:
-                image = getNanSum(self.ImageAvg.copy(), axis=2)
+                image = get_nan_sum(self.image_avg.copy(), axis=2)
             elif zindex is None and zindeces is not None:
-                image = getNanSum(
-                    self.ImageAvg[:, :, zindeces[0]: zindeces[1] + 1], axis=2
+                image = get_nan_sum(
+                    self.image_avg[:, :, zindeces[0]: zindeces[1] + 1], axis=2
                 )  # ,divide=abs(zindeces[1]-zindeces[0]))
 
             else:
-                image = self.ImageAvg[:, :, zindex]
+                image = self.image_avg[:, :, zindex]
                 if toDb:
                     image[image == 0] = 0.000000000000001
                     image = 10 * np.log10(image)
@@ -432,14 +442,14 @@ class EchoGridDict(MutableMapping):
         for k in self.keys():
             self.store[k].print(TrueValue, k, maxKeyLen)
 
-    def cutDepthLayer(self, layer_z, layer_size):
+    def cut_depth_layer(self, layer_z, layer_size):
         scd = EchoGridDict()
         for k in self.keys():
-            scd[k] = self[k].cutDepthLayer(layer_z, layer_size)
+            scd[k] = self[k].cut_depth_layer(layer_z, layer_size)
 
-        z_extend = scd[k].ExtentZ
+        z_extend = scd[k].extent_z
         true_layer_size_z = abs(z_extend[1] - z_extend[0])
-        z_coordinates = scd[k].getGridder().get_z_coordinates()
+        z_coordinates = scd[k].get_gridder().get_z_coordinates()
 
         return scd, (z_extend, true_layer_size_z, z_coordinates)
 
@@ -487,11 +497,11 @@ if __name__ == "__main__":
     scd["test"] = sc
     scd["test2"] = imN, imS, gridder
 
-    print(scd["test"].toString(999, "peter", 10))
-    print(scd["test2"].toString(1010, "peter", 10))
-    print(scd["test2"].toString(1020, "peter"))
+    print(scd["test"].to_string(999, "peter", 10))
+    print(scd["test2"].to_string(1010, "peter", 10))
+    print(scd["test2"].to_string(1020, "peter"))
     print(
-        scd["test2"].toString(
+        scd["test2"].to_string(
             1030,
         )
     )
