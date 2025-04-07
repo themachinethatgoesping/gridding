@@ -13,11 +13,10 @@ Simple gridder class that can create quantitative 3D images from x,z,y,val from 
 import numpy as np
 from numpy.typing import ArrayLike
 
-#from .functions import gridfunctions as grdf
-from themachinethatgoesping.algorithms.gridding import functions as grdf
+from .functions import gridfunctions as grdf
 
 
-class ForwardGridder:
+class ForwardGridderLegacy:
     """Simple class to generate 3D grids (images) and interpolate xyz data onto a grid using simple forward mapping algorithms.
     (e.g. block mean, weighted mean interpolation)
     """
@@ -44,7 +43,7 @@ class ForwardGridder:
             ForwardGridder object
         """
         return cls.from_res(
-            res, *grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz).astype(np.array(sx).dtype))
+            res, *grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz))
         )
 
     # -- factory methods --
@@ -225,12 +224,12 @@ class ForwardGridder:
         grdf.grd_block_mean(
             np.array(sx),
             np.array(sy),
-            np.array(sz).astype(np.array(sx).dtype),
+            np.array(sz),
             np.array(s_val),
             *self._get_min_and_offset(),
             image_values=image_values,
             image_weights=image_weights,
-            #skip_invalid=skip_invalid
+            skip_invalid=skip_invalid
         )
         return image_values, image_weights
 
@@ -286,12 +285,12 @@ class ForwardGridder:
         grdf.grd_weighted_mean(
             np.array(sx),
             np.array(sy),
-            np.array(sz).astype(np.array(sx).dtype),
+            np.array(sz),
             np.array(s_val),
             *self._get_min_and_offset(),
             image_values=image_values,
             image_weights=image_weights,
-            #skip_invalid=skip_invalid
+            skip_invalid=skip_invalid
         )
         return image_values, image_weights
 
@@ -314,7 +313,7 @@ class ForwardGridder:
         tuple
             with (xmin,xmax,ymin,ymax,zmin,zmax)
         """
-        return grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz).astype(np.array(sx).dtype),)
+        return grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz))
 
     def get_x_index(self, x: float) -> int:
         """get the x index of the grid cell that physically contains "x"
@@ -379,7 +378,7 @@ class ForwardGridder:
         -------
         y_index : float
         """
-        return grdf.get_index_fraction(y, self.ymin, self.yres)
+        return grdf.get_index_fraction(y, self.xmin, self.xres)
 
     def get_z_index_fraction(self, z: float) -> float:
         """get the fractional z index of "z" within the 3D grid image
@@ -392,7 +391,7 @@ class ForwardGridder:
         -------
         z_index : float
         """
-        return grdf.get_index_fraction(z, self.zmin, self.zres)
+        return grdf.get_index_fraction(z, self.xmin, self.xres)
 
     def get_x_value(self, x_index: float) -> float:
         """return the x value of the grid cell of index x_index

@@ -89,9 +89,7 @@ def get_grd_value(value: float, grd_val_min: float, grd_res: float) -> float:
 
 
 @njit
-def get_index_weights(
-    fraction_index_x: float, fraction_index_y: float, fraction_index_z: float
-) -> tuple:
+def get_index_weights(fraction_index_x: float, fraction_index_y: float, fraction_index_z: float) -> tuple:
     """
     Return a vector with fraction and weights for the neighboring grid cells.
     """
@@ -210,12 +208,10 @@ def grd_weighted_mean(
                     continue
 
             # print(ix,iy,iz,v,w)
-            #if v >= 0:
+            # if v >= 0:
             if np.isfinite(v):
                 image_values[ix][iy][iz] += v * w
                 image_weights[ix][iy][iz] += w
-
-    return image_values, image_weights
 
 
 @njit
@@ -277,9 +273,7 @@ def grd_block_mean(
             if abs(iz) >= nz:
                 continue
 
-        #if v >= 0:
+        # if v >= 0:
         if np.isfinite(v):
             image_values[ix][iy][iz] += v
             image_weights[ix][iy][iz] += 1
-
-    return image_values, image_weights

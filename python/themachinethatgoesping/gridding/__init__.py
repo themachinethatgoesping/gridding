@@ -6,7 +6,8 @@
 from . import functions
 
 # modules
-from .echogrid import EchoGrid
 from .forwardgridder import ForwardGridder
+from .forwardgridderlegacy import ForwardGridderLegacy
+from .echogrid import EchoGrid
 
 __version__ = "@PROJECT_VERSION@"

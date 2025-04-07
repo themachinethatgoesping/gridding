@@ -14,10 +14,10 @@ class Test_ForwardGridder_interpolation:
     # TODO: need some real tests for the interpolation ...
     def test_ForwardGridder_should_not_change_the_value_sum(self):
         res = 0.5
-        sx = [-1, -1.3, 0, 0, 3]
-        sy = [-1, -1.3, 2, 2, 3]
-        sz = [-1, -1.3, 0, 0, 3]
-        sv = [1, 2, 3, 4, 5]
+        sx = np.array([-1, -1.3, 0, 0, 3])
+        sy = np.array([-1, -1.3, 2, 2, 3])
+        sz = np.array([-1, -1.3, 0, 0, 3])
+        sv = np.array([1, 2, 3, 4, 5]).astype(sx.dtype)
 
         gridder = ForwardGridder.from_data(res, sx, sy, sz)
 
