@@ -8,7 +8,9 @@ import numpy as np
 from numba import njit
 
 from .functions import gridfunctions as gf
+from .forwardgridderlegacy import ForwardGridderLegacy
 from .forwardgridderlegacynew import ForwardGridderLegacyNew
+from themachinethatgoesping.algorithms.gridding import ForwardGridder3D
 
 from collections.abc import MutableMapping
 
@@ -48,12 +50,30 @@ class EchoGrid:
     
     @classmethod
     def from_data(cls, res, sx, sy, sz, sv, blockmean=False):
-        gridder = ForwardGridderLegacyNew.from_data(res, sx, sy, sz)
+        gridder = ForwardGridder3D.from_data(res, sx, sy, sz)
         if blockmean:
             image_sums, imagenumes = gridder.interpolate_block_mean(sx,sy,sz,sv)
         else:
             image_sums, imagenumes = gridder.interpolate_weighted_mean(sx,sy,sz,sv)
         return cls(image_sums, imagenumes, gridder)
+    
+    @classmethod
+    def from_data_legacy(cls, res, sx, sy, sz, sv, blockmean=False):
+        gridder = ForwardGridderLegacy.from_data(res, sx, sy, sz)
+        if blockmean:
+            image_sums, imagenumes = gridder.interpolate_block_mean(sx,sy,sz,sv)
+        else:
+            image_sums, imagenumes = gridder.interpolate_weighted_mean(sx,sy,sz,sv)
+        return cls(image_sums, imagenumes, ForwardGridder3D.from_data(res, sx, sy, sz))
+    
+    @classmethod
+    def from_data_legacy_new(cls, res, sx, sy, sz, sv, blockmean=False):
+        gridder = ForwardGridderLegacyNew.from_data(res, sx, sy, sz)
+        if blockmean:
+            image_sums, imagenumes = gridder.interpolate_block_mean(sx,sy,sz,sv)
+        else:
+            image_sums, imagenumes = gridder.interpolate_weighted_mean(sx,sy,sz,sv)
+        return cls(image_sums, imagenumes, ForwardGridder3D.from_data(res, sx, sy, sz))
     
     def __init__(self, image_sums, image_nums, gridder):
         self.image_sums = image_sums.copy()
@@ -66,7 +86,7 @@ class EchoGrid:
         )
 
         self.total_value = np.nansum(self.image_avg) * (
-            gridder.xres * gridder.yres * gridder.zres
+            gridder.get_xres() * gridder.get_yres() * gridder.get_zres()
         )
 
         self.ZDiff = gridder.get_extent_z()[1] - gridder.get_extent_z()[0]
@@ -75,8 +95,8 @@ class EchoGrid:
             warnings.simplefilter("ignore", category=RuntimeWarning)
             self.total_value_layer = (
                 np.nansum(np.nanmean(self.image_avg, axis=2))
-                * gridder.xres
-                * gridder.yres
+                * gridder.get_xres()
+                * gridder.get_yres()
                 * self.ZDiff
             )
 
@@ -84,15 +104,15 @@ class EchoGrid:
         self.extent_x = gridder.get_extent_x()
         self.extent_y = gridder.get_extent_y()
         self.extent_z = gridder.get_extent_z()
-        self.res_x = gridder.xres
-        self.res_y = gridder.yres
-        self.res_z = gridder.zres
-        self.min_x = gridder.xmin
-        self.max_x = gridder.xmax
-        self.min_y = gridder.ymin
-        self.max_y = gridder.ymax
-        self.min_z = gridder.zmin
-        self.max_z = gridder.zmax
+        self.res_x = gridder.get_xres()
+        self.res_y = gridder.get_yres()
+        self.res_z = gridder.get_zres()
+        self.min_x = gridder.get_xmin()
+        self.max_x = gridder.get_xmax()
+        self.min_y = gridder.get_ymin()
+        self.max_y = gridder.get_ymax()
+        self.min_z = gridder.get_zmin()
+        self.max_z = gridder.get_zmax()
 
     def get_target_pos(self, min_val=np.nan):
         xi, yi, zi = static_get_target_pos(self.image_avg, min_val)
@@ -127,7 +147,7 @@ class EchoGrid:
         )
 
     def get_gridder(self):
-        return ForwardGridderLegacyNew(
+        return ForwardGridder3D(
             self.res_x,
             self.res_y,
             self.res_z,
@@ -160,7 +180,7 @@ class EchoGrid:
         if max_z is None:
             max_z = self.max_z
         
-        gridder = ForwardGridderLegacyNew(
+        gridder = ForwardGridder3D(
             self.res_x,
             self.res_y,
             self.res_z,
@@ -191,7 +211,7 @@ class EchoGrid:
             layer_z + (layer_size - gridder_old.zres) / 2
         )
 
-        gridder = ForwardGridderLegacyNew(
+        gridder = ForwardGridder3D(
             self.res_x,
             self.res_y,
             self.res_z,
