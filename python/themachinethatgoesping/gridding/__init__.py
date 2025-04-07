@@ -6,7 +6,7 @@
 from . import functions
 
 # modules
-from .forwardgridder import ForwardGridder
+from .forwardgridderlegacynew import ForwardGridderLegacyNew
 from .forwardgridderlegacy import ForwardGridderLegacy
 from .echogrid import EchoGrid
 

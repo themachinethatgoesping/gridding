@@ -3,12 +3,12 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # test basic imports
-from themachinethatgoesping.gridding.forwardgridder import ForwardGridder
+from themachinethatgoesping.gridding.forwardgridderlegacynew import ForwardGridderLegacyNew
 
 from pytest import approx
 
 
-# test function to test the grid parameter initialization for the ForwardGridder class
+# test function to test the grid parameter initialization for the ForwardGridderLegacyNew class
 class Test_ForwardGridder_init:
     # define actual tests (must start with "test_"
     def test_ForwardGridder_init_should_reproduce_expected_grid_parameters(self):
@@ -20,7 +20,7 @@ class Test_ForwardGridder_init:
         ymax = 3.4
         zmax = 3.6
 
-        gridder = ForwardGridder(*res, xmin, xmax, ymin, ymax, zmin, zmax)
+        gridder = ForwardGridderLegacyNew(*res, xmin, xmax, ymin, ymax, zmin, zmax)
 
         assert gridder.xmin == -2
         assert gridder.ymin == -3
@@ -55,7 +55,7 @@ class Test_ForwardGridder_init:
         ybase = -0.5
         zbase = 1 / 3
 
-        gridder = ForwardGridder(
+        gridder = ForwardGridderLegacyNew(
             *res, xmin, xmax, ymin, ymax, zmin, zmax, xbase, ybase, zbase
         )
 
@@ -89,7 +89,7 @@ class Test_ForwardGridder_init:
         ymax = 3.4
         zmax = 3.6
 
-        gridder = ForwardGridder(*res, xmin, xmax, ymin, ymax, zmin, zmax)
+        gridder = ForwardGridderLegacyNew(*res, xmin, xmax, ymin, ymax, zmin, zmax)
 
         assert gridder.xmin == approx(-2.5)
         assert gridder.ymin == approx(-2 - 2 / 3)

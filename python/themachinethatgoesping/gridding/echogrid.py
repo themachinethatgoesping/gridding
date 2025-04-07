@@ -8,7 +8,7 @@ import numpy as np
 from numba import njit
 
 from .functions import gridfunctions as gf
-from .forwardgridder import ForwardGridder
+from .forwardgridderlegacynew import ForwardGridderLegacyNew
 
 from collections.abc import MutableMapping
 
@@ -48,7 +48,7 @@ class EchoGrid:
     
     @classmethod
     def from_data(cls, res, sx, sy, sz, sv, blockmean=False):
-        gridder = ForwardGridder.from_data(res, sx, sy, sz)
+        gridder = ForwardGridderLegacyNew.from_data(res, sx, sy, sz)
         if blockmean:
             image_sums, imagenumes = gridder.interpolate_block_mean(sx,sy,sz,sv)
         else:
@@ -127,7 +127,7 @@ class EchoGrid:
         )
 
     def get_gridder(self):
-        return ForwardGridder(
+        return ForwardGridderLegacyNew(
             self.res_x,
             self.res_y,
             self.res_z,
@@ -160,7 +160,7 @@ class EchoGrid:
         if max_z is None:
             max_z = self.max_z
         
-        gridder = ForwardGridder(
+        gridder = ForwardGridderLegacyNew(
             self.res_x,
             self.res_y,
             self.res_z,
@@ -191,7 +191,7 @@ class EchoGrid:
             layer_z + (layer_size - gridder_old.zres) / 2
         )
 
-        gridder = ForwardGridder(
+        gridder = ForwardGridderLegacyNew(
             self.res_x,
             self.res_y,
             self.res_z,

@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import themachinethatgoesping.algorithms.gridding as alg
-import themachinethatgoesping.gridding.forwardgridder as grd
+import themachinethatgoesping.gridding.forwardgridderlegacynew as grd
 
 
 @pytest.fixture
@@ -22,7 +22,7 @@ def sample_gridders(sample_data):
     res = 5.0
 
     # Create from_data
-    py_gridder = grd.ForwardGridder.from_data(res, sx, sy, sz)
+    py_gridder = grd.ForwardGridderLegacyNew.from_data(res, sx, sy, sz)
     cpp_gridder = alg.ForwardGridder3D.from_data(res, sx, sy, sz)
 
     return py_gridder, cpp_gridder
@@ -33,7 +33,7 @@ def test_from_data_equivalence(sample_data):
     sx, sy, sz, _ = sample_data
     res = 5.0
 
-    py_gridder = grd.ForwardGridder.from_data(res, sx, sy, sz)
+    py_gridder = grd.ForwardGridderLegacyNew.from_data(res, sx, sy, sz)
     cpp_gridder = alg.ForwardGridder3D.from_data(res, sx, sy, sz)
 
     # Compare basic properties
@@ -58,7 +58,7 @@ def test_from_res_equivalence():
     min_y, max_y = -50.0, 50.0
     min_z, max_z = -25.0, 25.0
 
-    py_gridder = grd.ForwardGridder.from_res(res, min_x, max_x, min_y, max_y, min_z, max_z)
+    py_gridder = grd.ForwardGridderLegacyNew.from_res(res, min_x, max_x, min_y, max_y, min_z, max_z)
     cpp_gridder = alg.ForwardGridder3D.from_res(res, min_x, max_x, min_y, max_y, min_z, max_z)
 
     # Compare basic properties
@@ -77,7 +77,7 @@ def test_get_minmax_equivalence(sample_data):
     # Test static get_minmax function
     sx, sy, sz, _ = sample_data
 
-    py_result = grd.ForwardGridder.get_minmax(sx, sy, sz)
+    py_result = grd.ForwardGridderLegacyNew.get_minmax(sx, sy, sz)
     cpp_result = alg.ForwardGridder3D.get_minmax(sx, sy, sz)
 
     # Convert cpp_result tuple to list for easier comparison

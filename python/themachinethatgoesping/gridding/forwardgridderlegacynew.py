@@ -17,7 +17,7 @@ from numpy.typing import ArrayLike
 from themachinethatgoesping.algorithms.gridding import functions as grdf
 
 
-class ForwardGridder:
+class ForwardGridderLegacyNew:
     """Simple class to generate 3D grids (images) and interpolate xyz data onto a grid using simple forward mapping algorithms.
     (e.g. block mean, weighted mean interpolation)
     """
@@ -40,8 +40,8 @@ class ForwardGridder:
 
         Returns
         -------
-        ForwardGridder
-            ForwardGridder object
+        ForwardGridderLegacyNew
+            ForwardGridderLegacyNew object
         """
         return cls.from_res(
             res, *grdf.get_minmax(np.array(sx), np.array(sy), np.array(sz).astype(np.array(sx).dtype))
@@ -80,8 +80,8 @@ class ForwardGridder:
 
         Returns
         -------
-        ForwardGridder
-            ForwardGridder object
+        ForwardGridderLegacyNew
+            ForwardGridderLegacyNew object
         """
         return cls(res, res, res, min_x, max_x, min_y, max_y, min_z, max_z)
 
@@ -215,12 +215,12 @@ class ForwardGridder:
                 self.nx,
                 self.ny,
                 self.nz,
-            ), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
+            ), "ERROR: image_values dimensions do not fit ForwardGridderLegacyNew dimensions!"
             assert image_weights.shape == (
                 self.nx,
                 self.ny,
                 self.nz,
-            ), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
+            ), "ERROR: image_weight dimensions do not fit ForwardGridderLegacyNew dimensions!"
 
         grdf.grd_block_mean(
             np.array(sx),
@@ -276,12 +276,12 @@ class ForwardGridder:
                 self.nx,
                 self.ny,
                 self.nz,
-            ), "ERROR: image_values dimensions do not fit ForwardGridder dimensions!"
+            ), "ERROR: image_values dimensions do not fit ForwardGridderLegacyNew dimensions!"
             assert image_weights.shape == (
                 self.nx,
                 self.ny,
                 self.nz,
-            ), "ERROR: image_weight dimensions do not fit ForwardGridder dimensions!"
+            ), "ERROR: image_weight dimensions do not fit ForwardGridderLegacyNew dimensions!"
 
         grdf.grd_weighted_mean(
             np.array(sx),

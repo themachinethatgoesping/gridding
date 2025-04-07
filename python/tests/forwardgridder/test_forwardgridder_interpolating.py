@@ -3,13 +3,13 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # test basic imports
-from themachinethatgoesping.gridding.forwardgridder import ForwardGridder
+from themachinethatgoesping.gridding.forwardgridderlegacynew import ForwardGridderLegacyNew
 
 import numpy as np
 from pytest import approx
 
 
-# test functions to test the grid indexing functions for the ForwardGridder class
+# test functions to test the grid indexing functions for the ForwardGridderLegacyNew class
 class Test_ForwardGridder_interpolation:
     # TODO: need some real tests for the interpolation ...
     def test_ForwardGridder_should_not_change_the_value_sum(self):
@@ -19,7 +19,7 @@ class Test_ForwardGridder_interpolation:
         sz = np.array([-1, -1.3, 0, 0, 3])
         sv = np.array([1, 2, 3, 4, 5]).astype(sx.dtype)
 
-        gridder = ForwardGridder.from_data(res, sx, sy, sz)
+        gridder = ForwardGridderLegacyNew.from_data(res, sx, sy, sz)
 
         # block mean
         ival, iweight = gridder.interpolate_block_mean(sx, sy, sz, sv)

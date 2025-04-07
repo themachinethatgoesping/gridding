@@ -3,14 +3,14 @@
 # SPDX-License-Identifier: MPL-2.0
 
 # test basic imports
-from themachinethatgoesping.gridding.forwardgridder import ForwardGridder
+from themachinethatgoesping.gridding.forwardgridderlegacynew import ForwardGridderLegacyNew
 
 # import numpy as np
 # import time
 from pytest import approx
 
 
-# test functions to test the grid indexing functions for the ForwardGridder class
+# test functions to test the grid indexing functions for the ForwardGridderLegacyNew class
 class Test_ForwardGridder_index_functions:
     def test_ForwardGridder_index_functions_should_reproduce_expected_grid_parameters(
         self,
@@ -23,7 +23,7 @@ class Test_ForwardGridder_index_functions:
         ymax = 3.4
         zmax = 3.6
 
-        gridder = ForwardGridder(*res, xmin, xmax, ymin, ymax, zmin, zmax)
+        gridder = ForwardGridderLegacyNew(*res, xmin, xmax, ymin, ymax, zmin, zmax)
 
         # indices
         assert gridder.get_x_index(-2.4) == 0
