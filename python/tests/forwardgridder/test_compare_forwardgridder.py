@@ -221,7 +221,7 @@ def test_block_mean_interpolation_equivalence(sample_data, sample_gridders):
 
     # Run interpolation
     py_gridder.interpolate_block_mean(sx, sy, sz, sv, py_values, py_weights)
-    cpp_gridder.interpolate_block_mean(sx, sy, sz, sv, cpp_values, cpp_weights)
+    cpp_gridder.interpolate_block_mean_inplace(sx, sy, sz, sv, cpp_values, cpp_weights)
 
     # Compare results
     # Only compare non-zero elements to avoid precision issues with zeros
@@ -242,7 +242,7 @@ def test_weighted_mean_interpolation_equivalence(sample_data, sample_gridders):
 
     # Run interpolation
     py_gridder.interpolate_weighted_mean(sx, sy, sz, sv, py_values, py_weights)
-    cpp_gridder.interpolate_weighted_mean(sx, sy, sz, sv, cpp_values, cpp_weights)
+    cpp_gridder.interpolate_weighted_mean_inplace(sx, sy, sz, sv, cpp_values, cpp_weights)
 
     # Compare results
     # Only compare non-zero elements to avoid precision issues with zeros
