@@ -4,12 +4,14 @@
 
 # -- python sources --
 sources = [
-    #'themachinethatgoesping/gridding/__init__.py', this file will be configured below
-    'themachinethatgoesping/gridding/echogrid.py',
-    'themachinethatgoesping/gridding/forwardgridder.py',
-    'themachinethatgoesping/gridding/functions/__init__.py',
-    'themachinethatgoesping/gridding/functions/gridfunctions.py',
-    'themachinethatgoesping/gridding/functions/helperfunctions.py',
+  'themachinethatgoesping/__init__.py',
+  'themachinethatgoesping/gridding/__init__.py',
+  'themachinethatgoesping/gridding/echogrid.py',
+  'themachinethatgoesping/gridding/forwardgridderlegacy.py',
+  'themachinethatgoesping/gridding/forwardgridderlegacynew.py',
+  'themachinethatgoesping/gridding/functions/__init__.py',
+  'themachinethatgoesping/gridding/functions/gridfunctions.py',
+  'themachinethatgoesping/gridding/functions/helperfunctions.py',
 ]
 
            
