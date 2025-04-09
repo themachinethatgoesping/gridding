@@ -4,7 +4,7 @@
 
 # -- python sources --
 sources = [
-  'themachinethatgoesping/__init__.py',
+  #'themachinethatgoesping/__init__.py',
   'themachinethatgoesping/gridding/__init__.py',
   'themachinethatgoesping/gridding/echogrid.py',
   'themachinethatgoesping/gridding/forwardgridderlegacy.py',
