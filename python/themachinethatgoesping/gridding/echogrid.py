@@ -203,10 +203,10 @@ class EchoGrid:
         gridder_old = self.get_gridder()
 
         min_z = gridder_old.get_z_grd_value(
-            layer_z - (layer_size - gridder_old.zres) / 2
+            layer_z - (layer_size - gridder_old.get_zres()) / 2
         )
         max_z = gridder_old.get_z_grd_value(
-            layer_z + (layer_size - gridder_old.zres) / 2
+            layer_z + (layer_size - gridder_old.get_zres()) / 2
         )
         
         return self.cut_by_layer_extent(min_z, max_z)
@@ -377,7 +377,6 @@ class EchoGrid:
             axes = figure.subplots(ncols=nplots)
 
         axit = iter(axes)
-        image_extent_x, image_extent_y, image_extent_z = self.get_grid_extent()
 
         def get_nan_sum(imageLin, axis, divide=1):
             # image = np.nansum(imageLin,axis=axis)
@@ -415,14 +414,9 @@ class EchoGrid:
                         image[image < minDbVal] = minDbVal
 
             mapable = ax.imshow(
-                image.transpose(),
+                np.rot90(image),
                 aspect="equal",
-                extent=[
-                    image_extent_y[0],
-                    image_extent_y[1],
-                    image_extent_z[1],
-                    image_extent_z[0],
-                ],
+                extent=self.get_grid_extent('yz'),
                 **kwargs
             )
 
@@ -449,14 +443,9 @@ class EchoGrid:
                         image[image < minDbVal] = minDbVal
 
             mapable = ax.imshow(
-                image.transpose(),
+                np.rot90(image),
                 aspect="equal",
-                extent=[
-                    image_extent_x[0],
-                    image_extent_x[1],
-                    image_extent_z[1],
-                    image_extent_z[0],
-                ],
+                extent=self.get_grid_extent('xz'),
                 **kwargs
             )
             if targets_color:
@@ -489,12 +478,7 @@ class EchoGrid:
             mapable = ax.imshow(
                 image,
                 aspect="equal",
-                extent=[
-                    image_extent_y[0],
-                    image_extent_y[1],
-                    image_extent_x[1],
-                    image_extent_x[0],
-                ],
+                extent=self.get_grid_extent('yx'),
                 **kwargs
             )
             if targets_color:
