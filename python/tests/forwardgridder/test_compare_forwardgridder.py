@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-import themachinethatgoesping.algorithms.gridding as alg
+from themachinethatgoesping.algorithms_cppy import gridding as alg
 import themachinethatgoesping.gridding.forwardgridderlegacynew as grd
 
 
