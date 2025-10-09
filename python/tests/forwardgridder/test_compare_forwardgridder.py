@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+import pandas as pd
 from themachinethatgoesping.algorithms_cppy import gridding as alg
 import themachinethatgoesping.gridding.forwardgridderlegacynew as grd
 
@@ -49,6 +50,55 @@ def test_from_data_equivalence(sample_data):
     assert py_gridder.ymax == pytest.approx(cpp_gridder.get_ymax())
     assert py_gridder.zmin == pytest.approx(cpp_gridder.get_zmin())
     assert py_gridder.zmax == pytest.approx(cpp_gridder.get_zmax())
+
+
+def test_from_data_accepts_pandas_series(sample_data):
+    # Regression test: pandas Series inputs should convert without raising TypeError
+    sx, sy, sz, _ = sample_data
+    res = 5.0
+
+    sx_series = pd.Series(sx)
+    sy_series = pd.Series(sy)
+    sz_series = pd.Series(sz)
+
+    cpp_from_numpy = alg.ForwardGridder3D.from_data(res, sx, sy, sz)
+    cpp_from_series = alg.ForwardGridder3D.from_data(res, sx_series, sy_series, sz_series)
+
+    assert cpp_from_series.get_nx() == cpp_from_numpy.get_nx()
+    assert cpp_from_series.get_ny() == cpp_from_numpy.get_ny()
+    assert cpp_from_series.get_nz() == cpp_from_numpy.get_nz()
+    assert cpp_from_series.get_xmin() == pytest.approx(cpp_from_numpy.get_xmin())
+    assert cpp_from_series.get_xmax() == pytest.approx(cpp_from_numpy.get_xmax())
+    assert cpp_from_series.get_ymin() == pytest.approx(cpp_from_numpy.get_ymin())
+    assert cpp_from_series.get_ymax() == pytest.approx(cpp_from_numpy.get_ymax())
+    assert cpp_from_series.get_zmin() == pytest.approx(cpp_from_numpy.get_zmin())
+    assert cpp_from_series.get_zmax() == pytest.approx(cpp_from_numpy.get_zmax())
+
+
+def test_from_data_accepts_pandas_pyarrow_series(sample_data):
+    # Regression test: pandas Series with pyarrow dtype backend should also convert
+    sx, sy, sz, _ = sample_data
+    res = 5.0
+
+    try:
+        sx_series = pd.Series(sx, dtype="float64[pyarrow]")
+        sy_series = pd.Series(sy, dtype="float64[pyarrow]")
+        sz_series = pd.Series(sz, dtype="float64[pyarrow]")
+    except (TypeError, ValueError, ImportError) as exc:
+        pytest.skip(f"PyArrow dtype backend unavailable: {exc}")
+
+    cpp_from_numpy = alg.ForwardGridder3D.from_data(res, sx, sy, sz)
+    cpp_from_pyarrow = alg.ForwardGridder3D.from_data(res, sx_series, sy_series, sz_series)
+
+    assert cpp_from_pyarrow.get_nx() == cpp_from_numpy.get_nx()
+    assert cpp_from_pyarrow.get_ny() == cpp_from_numpy.get_ny()
+    assert cpp_from_pyarrow.get_nz() == cpp_from_numpy.get_nz()
+    assert cpp_from_pyarrow.get_xmin() == pytest.approx(cpp_from_numpy.get_xmin())
+    assert cpp_from_pyarrow.get_xmax() == pytest.approx(cpp_from_numpy.get_xmax())
+    assert cpp_from_pyarrow.get_ymin() == pytest.approx(cpp_from_numpy.get_ymin())
+    assert cpp_from_pyarrow.get_ymax() == pytest.approx(cpp_from_numpy.get_ymax())
+    assert cpp_from_pyarrow.get_zmin() == pytest.approx(cpp_from_numpy.get_zmin())
+    assert cpp_from_pyarrow.get_zmax() == pytest.approx(cpp_from_numpy.get_zmax())
 
 
 def test_from_res_equivalence():
