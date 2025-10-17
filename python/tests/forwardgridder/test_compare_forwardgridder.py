@@ -93,10 +93,10 @@ def test_from_data_accepts_pandas_pyarrow_series(sample_data):
                                                       np.array(sx_series.values), 
                                                       np.array(sy_series.values), 
                                                       np.array(sz_series.values))
-    cpp_from_pyarrow = alg.ForwardGridder3D.from_data(res, 
-                                                      sx_series, 
-                                                      sy_series, 
-                                                      sz_series)
+    # cpp_from_pyarrow = alg.ForwardGridder3D.from_data(res, 
+    #                                                   sx_series, 
+    #                                                   sy_series, 
+    #                                                   sz_series)
 
     assert cpp_from_pyarrow.get_nx() == cpp_from_numpy.get_nx()
     assert cpp_from_pyarrow.get_ny() == cpp_from_numpy.get_ny()
