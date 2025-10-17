@@ -1,7 +1,8 @@
 import pytest
 import numpy as np
 import pandas as pd
-from themachinethatgoesping.algorithms_cppy import gridding as alg
+#from themachinethatgoesping.algorithms_cppy import gridding as alg
+from themachinethatgoesping.algorithms import gridding as alg
 import themachinethatgoesping.gridding.forwardgridderlegacynew as grd
 
 
@@ -88,7 +89,14 @@ def test_from_data_accepts_pandas_pyarrow_series(sample_data):
         pytest.skip(f"PyArrow dtype backend unavailable: {exc}")
 
     cpp_from_numpy = alg.ForwardGridder3D.from_data(res, sx, sy, sz)
-    cpp_from_pyarrow = alg.ForwardGridder3D.from_data(res, sx_series, sy_series, sz_series)
+    cpp_from_pyarrow = alg.ForwardGridder3D.from_data(res, 
+                                                      np.array(sx_series.values), 
+                                                      np.array(sy_series.values), 
+                                                      np.array(sz_series.values))
+    cpp_from_pyarrow = alg.ForwardGridder3D.from_data(res, 
+                                                      sx_series, 
+                                                      sy_series, 
+                                                      sz_series)
 
     assert cpp_from_pyarrow.get_nx() == cpp_from_numpy.get_nx()
     assert cpp_from_pyarrow.get_ny() == cpp_from_numpy.get_ny()
