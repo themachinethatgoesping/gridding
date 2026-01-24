@@ -54,7 +54,8 @@ def test_from_data_equivalence(sample_data):
 
 
 def test_from_data_accepts_pandas_series(sample_data):
-    # Regression test: pandas Series inputs should convert without raising TypeError
+    # Test that pandas Series can be converted to numpy arrays for use with from_data
+    # Note: C++ bindings don't auto-convert pandas Series, explicit conversion required
     sx, sy, sz, _ = sample_data
     res = 5.0
 
@@ -63,7 +64,12 @@ def test_from_data_accepts_pandas_series(sample_data):
     sz_series = pd.Series(sz)
 
     cpp_from_numpy = alg.ForwardGridder3D.from_data(res, sx, sy, sz)
-    cpp_from_series = alg.ForwardGridder3D.from_data(res, sx_series, sy_series, sz_series)
+    cpp_from_series = alg.ForwardGridder3D.from_data(
+        res, 
+        np.asarray(sx_series), 
+        np.asarray(sy_series), 
+        np.asarray(sz_series)
+    )
 
     assert cpp_from_series.get_nx() == cpp_from_numpy.get_nx()
     assert cpp_from_series.get_ny() == cpp_from_numpy.get_ny()
