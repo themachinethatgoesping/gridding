@@ -1,7 +1,13 @@
 import pytest
 import numpy as np
-import themachinethatgoesping.algorithms.gridding.functions as algf
 import themachinethatgoesping.gridding.functions.gridfunctions as grdgf
+
+# Skip entire module if themachinethatgoesping.algorithms is not available
+# (only available when running as part of the main themachinethatgoesping project)
+try:
+    import themachinethatgoesping.algorithms.gridding.functions as algf
+except ImportError:
+    pytest.skip("themachinethatgoesping.algorithms not available", allow_module_level=True)
 
 def test_minmax_equivalence():
     sx = np.array([1.0, 2.5, 3.5])

@@ -1,9 +1,14 @@
 import pytest
 import numpy as np
 import pandas as pd
-#from themachinethatgoesping.algorithms_cppy import gridding as alg
-from themachinethatgoesping.algorithms import gridding as alg
 import themachinethatgoesping.gridding.forwardgridderlegacynew as grd
+
+# Skip entire module if themachinethatgoesping.algorithms is not available
+# (only available when running as part of the main themachinethatgoesping project)
+try:
+    from themachinethatgoesping.algorithms import gridding as alg
+except ImportError:
+    pytest.skip("themachinethatgoesping.algorithms not available", allow_module_level=True)
 
 
 @pytest.fixture
