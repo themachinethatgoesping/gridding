@@ -66,9 +66,9 @@ def test_from_data_accepts_pandas_series(sample_data):
     cpp_from_numpy = alg.ForwardGridder3D.from_data(res, sx, sy, sz)
     cpp_from_series = alg.ForwardGridder3D.from_data(
         res, 
-        np.asarray(sx_series), 
-        np.asarray(sy_series), 
-        np.asarray(sz_series)
+        sx_series.to_numpy(dtype=np.float64), 
+        sy_series.to_numpy(dtype=np.float64), 
+        sz_series.to_numpy(dtype=np.float64)
     )
 
     assert cpp_from_series.get_nx() == cpp_from_numpy.get_nx()
